@@ -1,0 +1,14 @@
+<!-- @dsCard group="Listings" height=460 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>PropertyCard — preview</title><style>.g{display:grid;gap:24px;padding:16px;grid-template-columns:1fr;align-items:start}@media(min-width:720px){.g{grid-template-columns:minmax(0,320px) minmax(0,1fr)}}</style></head>
+<body>
+<div id="root"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(h('div', {className:'g'},
+   h(E.PropertyCard, {kind:'apartment', title:'Sunny 2-bed loft near the river', location:'Alfama, Lisbon', price:2450, beds:2, baths:1, area:78, rating:4.86, reviews:128, badges:[{label:'Verified', tone:'brand', icon:'shield-check'}], photoCount:18, availableFrom:'Available 1 Mar', defaultSaved:true}),
+   h(E.PropertyCard, {layout:'horizontal', kind:'house', title:'Family house with garden', location:'Cascais, Lisbon District', price:3100, originalPrice:3400, beds:4, baths:3, area:180, rating:4.7, reviews:22, badges:[{label:'Price drop', tone:'accent'}], availableFrom:'Available now'})));
+</script>
+</body>
+</html>

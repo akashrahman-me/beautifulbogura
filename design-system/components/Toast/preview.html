@@ -1,0 +1,12 @@
+<!-- @dsCard group="Feedback" height=170 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Toast — preview</title></head>
+<body>
+<div id="root"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(h('div', {style:{display:'flex',flexDirection:'column',gap:12,padding:16}}, h(E.Toast, {tone:'success', title:'Saved to Lisbon shortlist', actionLabel:'Change'}), h(E.Toast, {tone:'brand', icon:'bell', title:'Search saved'}, "We'll email you new matches daily."), h(E.Toast, {tone:'neutral', icon:'trash', title:'Listing removed', actionLabel:'Undo', onDismiss:function(){}})));
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<!-- @dsCard group="Navigation" height=80 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Pagination — preview</title></head>
+<body>
+<div id="root"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(h('div', {style:{padding:16}}, h(E.Pagination, {pageCount:12, defaultPage:4})));
+</script>
+</body>
+</html>

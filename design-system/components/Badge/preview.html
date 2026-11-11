@@ -1,0 +1,14 @@
+<!-- @dsCard group="Data display" height=120 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Badge — preview</title><style>.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}</style></head>
+<body>
+<div id="root" class="ers-demo"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(h('div', {style:{display:'flex',flexDirection:'column',gap:12}},
+   h('div', {className:'row'}, h(E.Badge, null, 'Furnished'), h(E.Badge, {tone:'brand', icon:'key'}, 'Instant apply'), h(E.Badge, {tone:'accent'}, 'Price drop'), h(E.Badge, {tone:'success', icon:'shield-check'}, 'Verified'), h(E.Badge, {tone:'warning', icon:'clock'}, 'Pending'), h(E.Badge, {tone:'danger', icon:'alert'}, 'Overdue'), h(E.Badge, {tone:'info', icon:'info'}, 'New area')),
+   h('div', {className:'row'}, h(E.Badge, {tone:'brand', variant:'solid'}, 'Featured'), h(E.Badge, {tone:'accent', variant:'solid'}, 'New'), h(E.Badge, {variant:'solid'}, 'Pets OK'), h(E.Badge, {tone:'success', size:'lg', icon:'calendar'}, 'Available 1 Mar'))));
+</script>
+</body>
+</html>

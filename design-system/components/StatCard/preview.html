@@ -1,0 +1,12 @@
+<!-- @dsCard group="Dashboard" height=150 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>StatCard — preview</title><style>.g{display:grid;gap:16px;padding:16px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}</style></head>
+<body>
+<div id="root"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(h('div', {className:'g'}, h(E.StatCard, {label:'Rent collected', icon:'dollar', value:'$18,240', delta:'+8.2%', hint:'vs February'}), h(E.StatCard, {label:'Occupancy', icon:'home', value:'92%', delta:'+4 pts', trend:'up', hint:'11 of 12 units'}), h(E.StatCard, {label:'Overdue', icon:'alert', value:'$1,250', delta:'-$600', positive:'down', hint:'vs February'}), h(E.StatCard, {label:'New applications', icon:'users', value:'7', delta:'0', trend:'flat', hint:'this week'})));
+</script>
+</body>
+</html>

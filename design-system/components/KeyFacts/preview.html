@@ -1,0 +1,12 @@
+<!-- @dsCard group="Listings" height=130 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>KeyFacts — preview</title></head>
+<body>
+<div id="root"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(h('div', {style:{padding:16}}, h(E.KeyFacts, {items:[{icon:'bed',label:'Bedrooms',value:'2'},{icon:'bath',label:'Bathrooms',value:'1'},{icon:'area',label:'Size',value:'78 m²'},{icon:'calendar',label:'Available',value:'1 Mar 2027'}]})));
+</script>
+</body>
+</html>

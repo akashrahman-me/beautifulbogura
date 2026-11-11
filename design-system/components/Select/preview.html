@@ -1,0 +1,12 @@
+<!-- @dsCard group="Forms" height=120 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Select — preview</title><style>.g{display:grid;gap:20px;padding:16px;grid-template-columns:1fr 1fr}</style></head>
+<body>
+<div id="root"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(h('div', {className:'g'}, h(E.Select, {label:'Lease length', options:['12 months','6 months','Month-to-month']}), h(E.Select, {label:'Sort by', iconLeft:'list', options:['Recommended','Price: low to high','Price: high to low','Newest']})));
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<!-- @dsCard group="Layout" height=130 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>SectionHeader — preview</title></head>
+<body>
+<div id="root"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(h('div', {style:{padding:16}}, h(E.SectionHeader, {overline:'Popular this week', title:'Homes in Lisbon', description:'Verified rentals with landlords who reply within a day.', action:h(E.Button, {variant:'secondary', iconRight:'arrow-right'}, 'View all 1,240')})));
+</script>
+</body>
+</html>

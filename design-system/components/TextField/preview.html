@@ -1,0 +1,16 @@
+<!-- @dsCard group="Forms" height=290 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>TextField — preview</title><style>.g{display:grid;gap:20px;padding:16px;grid-template-columns:1fr}@media(min-width:640px){.g{grid-template-columns:1fr 1fr}}</style></head>
+<body>
+<div id="root"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(h('div', {className:'g'},
+   h(E.TextField, {label:'Full name', placeholder:'As on your ID', defaultValue:'Maya Lin'}),
+   h(E.TextField, {label:'Email', type:'email', iconLeft:'mail', placeholder:'you@example.com', hint:"We'll send viewing confirmations here."}),
+   h(E.TextField, {label:'Monthly income', inputMode:'numeric', iconLeft:'dollar', suffix:'/ month', optional:true}),
+   h(E.TextField, {label:'Phone', type:'tel', defaultValue:'555 01', error:'Enter a full phone number, including area code.'})));
+</script>
+</body>
+</html>

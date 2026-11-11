@@ -1,0 +1,12 @@
+<!-- @dsCard group="Listings" height=150 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>MapPin — preview</title><style>.map{position:relative;height:150px;background:var(--map-land);overflow:hidden}.map::before{content:'';position:absolute;left:-40px;right:-40px;top:58%;height:34px;background:var(--map-water);transform:rotate(-4deg)}.map .ers-pin{position:absolute}</style></head>
+<body>
+<div id="root"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(h('div', {className:'map'}, h(E.MapPin, {price:1890, style:{left:40,top:30}}), h(E.MapPin, {price:2450, active:true, style:{left:180,top:70}}), h(E.MapPin, {price:1650, saved:true, style:{left:330,top:24}}), h(E.MapPin, {price:3100, visited:true, style:{left:90,top:92}}), h(E.MapPin, {count:12, style:{left:440,top:70}})));
+</script>
+</body>
+</html>

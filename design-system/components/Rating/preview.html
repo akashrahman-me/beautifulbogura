@@ -1,0 +1,12 @@
+<!-- @dsCard group="Data display" height=80 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Rating — preview</title></head>
+<body>
+<div id="root" class="ers-demo"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(h(React.Fragment, null, h(E.Rating, {value:4.86, count:128}), h(E.Rating, {value:4.6, count:32, size:'sm'}), h(E.Rating, {value:4, variant:'stars'}), h(E.Rating, {value:5, variant:'stars', count:12})));
+</script>
+</body>
+</html>

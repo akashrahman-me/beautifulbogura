@@ -1,0 +1,12 @@
+<!-- @dsCard group="Feedback" height=80 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Spinner — preview</title></head>
+<body>
+<div id="root" class="ers-demo"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(h(React.Fragment, null, h(E.Spinner, null), h(E.Spinner, {label:'Finding homes…'}), h(E.Spinner, {size:'lg'})));
+</script>
+</body>
+</html>

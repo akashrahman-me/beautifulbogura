@@ -1,0 +1,12 @@
+<!-- @dsCard group="Forms" height=200 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Textarea — preview</title></head>
+<body>
+<div id="root"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(h('div', {style:{padding:16}}, h(E.Textarea, {label:'Introduce yourself to the landlord', maxLength:500, placeholder:'Who will live here, when you want to move in, and anything about your job or pets.', defaultValue:"Hi! I'm a nurse at St. Mary's, moving with my partner and our cat."})));
+</script>
+</body>
+</html>

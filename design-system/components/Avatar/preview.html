@@ -1,0 +1,13 @@
+<!-- @dsCard group="Data display" height=100 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Avatar — preview</title></head>
+<body>
+<div id="root" class="ers-demo"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(h(React.Fragment, null, h(E.Avatar, {name:'Maya Lin', size:'xs'}), h(E.Avatar, {name:'Maya Lin', size:'sm'}), h(E.Avatar, {name:'Daniel Okafor', size:'md', verified:true}), h(E.Avatar, {name:'Sofia Reyes', size:'lg', verified:true}), h(E.Avatar, {name:'Arjun Mehta', size:'xl'}),
+   h('span', {className:'ers-avatars'}, h(E.Avatar, {name:'Ana Cruz', size:'sm'}), h(E.Avatar, {name:'Ben Hall', size:'sm'}), h(E.Avatar, {name:'Chloe Park', size:'sm'}))));
+</script>
+</body>
+</html>

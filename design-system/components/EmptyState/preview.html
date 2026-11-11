@@ -1,0 +1,12 @@
+<!-- @dsCard group="Feedback" height=300 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>EmptyState — preview</title></head>
+<body>
+<div id="root"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(h(E.EmptyState, {icon:'search', title:'No homes match all your filters', actions:h(React.Fragment, null, h(E.Button, {variant:'secondary'}, 'Clear filters'), h(E.Button, {iconLeft:'bell'}, 'Save search'))}, 'Try a bigger budget or a wider area — or save this search and we\u2019ll tell you when something comes up.'));
+</script>
+</body>
+</html>

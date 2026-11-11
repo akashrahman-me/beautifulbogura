@@ -1,0 +1,12 @@
+<!-- @dsCard group="Listings" height=160 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>ImagePlaceholder — preview</title><style>.g{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px}.ph{aspect-ratio:4/3;border-radius:var(--radius-lg);overflow:hidden}</style></head>
+<body>
+<div id="root"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(h('div', {className:'g'}, ['house','apartment','townhouse','cabin'].map(function(k){ return h('div', {key:k, className:'ph'}, h(E.ImagePlaceholder, {kind:k})); })));
+</script>
+</body>
+</html>

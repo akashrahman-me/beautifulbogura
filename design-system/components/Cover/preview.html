@@ -1,0 +1,56 @@
+<!-- @dsCard height=288 -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>EasyRentSpot</title>
+<style>
+  html, body { margin:0; height:100%; }
+  body { background:var(--canvas); color:var(--ink); font-family:var(--font-sans); overflow:hidden; }
+  .cover { position:relative; width:960px; height:288px; overflow:hidden; }
+  .band { position:absolute; left:0; top:0; width:960px; height:112px; }
+  .band svg { display:block; }
+  .brand { fill:var(--brand); }
+  .deep { fill:var(--brand-strong); }
+  .ink { fill:var(--ink); }
+  .accent { fill:var(--accent); }
+  .tint { fill:var(--brand-soft); }
+  [data-theme="dark"] .tint { fill:var(--ink-subtle); }
+  .cut { fill:var(--canvas); }
+  .blk { rx:var(--radius-xl); }
+  .arch { rx:var(--radius-xl); }
+  .words { position:absolute; left:var(--space-10); bottom:var(--space-6); max-width:900px; }
+  .name { margin:0; font-family:var(--font-display); font-size:64px; line-height:.95; font-weight:800; letter-spacing:-0.025em; color:var(--ink); }
+  .name b { color:var(--brand); font-weight:800; }
+  .tag { margin:var(--space-2) 0 0 2px; font-size:14px; line-height:20px; color:var(--ink-muted); max-width:440px; }
+</style>
+</head>
+<body>
+<div class="cover">
+<div class="band" aria-hidden="true">
+<svg viewBox="0 0 960 112" width="960" height="112">
+<!--
+  blocks      brand 288w (the identity, largest) · ink 208w (deep) · brand-soft 176w (tint; ink-subtle in dark so it holds on the dark canvas) · brand-strong 96w · accent 72w (coral, small: it is the save/deal moment) — the top band, ~third of the 960×288 cover
+  arrangement a strip of unequal slabs bleeding off the top, bottoms on one baseline at 112, space-4 gutters, like a street of homes
+  pattern     half-round arches (doorways) cut in canvas from the slab bottoms — from "soft, friendly, large radii" + the home motif; five arches, one per slab
+  scales      widths in space-4 multiples; gutters space-4; arch 48×72 at radius-xl (half its width); slab corners radius-xl
+-->
+<rect class="brand blk" x="40" y="-40" width="288" height="152" rx="24"/>
+<rect class="tint blk" x="344" y="-40" width="176" height="152" rx="24"/>
+<rect class="ink blk" x="536" y="-40" width="208" height="152" rx="24"/>
+<rect class="deep blk" x="760" y="-40" width="96" height="152" rx="24"/>
+<rect class="accent blk" x="872" y="-40" width="72" height="152" rx="24"/>
+<rect class="cut arch" x="216" y="56" width="48" height="96" rx="24"/>
+<rect class="cut arch" x="408" y="56" width="48" height="96" rx="24"/>
+<rect class="cut arch" x="664" y="56" width="48" height="96" rx="24"/>
+<rect class="cut arch" x="784" y="56" width="48" height="96" rx="24"/>
+<rect class="cut arch" x="896" y="72" width="24" height="96" rx="12"/>
+</svg>
+</div>
+<div class="words">
+<h1 class="name">EasyRent<b>Spot</b></h1>
+<p class="tag">Verified rentals, honest prices, landlords who reply.</p>
+</div>
+</div>
+</body>
+</html>

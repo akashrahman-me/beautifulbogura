@@ -1,0 +1,13 @@
+<!-- @dsCard group="Layout" height=420 -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>ListingGrid — preview</title></head>
+<body>
+<div id="root"></div>
+<script>
+  var E = window.ERS, h = React.createElement, root = ReactDOM.createRoot(document.getElementById('root'));
+  var kinds=['house','apartment','townhouse'];
+  root.render(h('div', {style:{padding:16}}, h(E.ListingGrid, null, kinds.map(function(k,i){ return h(E.PropertyCard, {key:k, kind:k, title:['Garden house in Belém','Modern 1-bed near Marquês','Townhouse with patio'][i], location:['Belém, Lisbon','Avenidas Novas, Lisbon','Campo de Ourique, Lisbon'][i], price:[3200,1650,2400][i], beds:[3,1,2][i], baths:[2,1,2][i], area:[140,52,96][i], rating:[4.9,4.7,4.8][i], reviews:[24,61,9][i]}); }))));
+</script>
+</body>
+</html>
