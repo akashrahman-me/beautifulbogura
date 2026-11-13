@@ -1,5 +1,6 @@
 import { env, isDemo } from './env';
-import type { ApiFailure, ApiSuccess, Paginated } from '@/types/api';
+import { useSessionStore } from '@/stores/session.store';
+import type { ApiFailure, ApiSuccess, Paginated, Session, SessionUser } from '@/types/api';
 
 export class ApiError extends Error {
   constructor(
@@ -12,10 +13,14 @@ export class ApiError extends Error {
   }
 }
 
-// Access token lives in memory only (never localStorage). The portal is public; this is ready for the admin area.
+// Access token lives in memory only (never localStorage). The long-lived refresh token is an
+// httpOnly cookie the API sets after social sign-in, so a reload restores the session via /auth/refresh.
 let accessToken: string | null = null;
-export const setAccessToken = (token: string | null) => {
-  accessToken = token;
+
+/** Store a fresh session (or clear it on sign-out). Keeps the token and the visible profile in step. */
+export const setSession = (session: Session | null) => {
+  accessToken = session?.accessToken ?? null;
+  useSessionStore.getState().setUser(session?.user ?? null);
 };
 
 // Demo mode swaps the network for an in-browser fake of the same API. It is chosen by env, never as a fallback.
@@ -23,18 +28,26 @@ const transport: typeof fetch = isDemo
   ? (input, init) => import('@/mocks/demo-server').then((m) => m.demoFetch(input, init))
   : (input, init) => fetch(input, init);
 
-// Single-flight refresh: many 401s trigger one refresh call
-let refreshPromise: Promise<string | null> | null = null;
+// Single-flight refresh: many 401s (and the boot check) trigger one refresh call
+let refreshPromise: Promise<SessionUser | null> | null = null;
 
+/** Exchange the refresh cookie for an access token. Resolves to the signed-in user, or null when signed out. */
 export const refreshAccessToken = () => {
   refreshPromise ??= transport(`${env.NEXT_PUBLIC_API_URL}/auth/refresh`, { method: 'POST', credentials: 'include' })
     .then(async (res) => {
-      if (!res.ok) return null;
-      const json = (await res.json()) as ApiSuccess<{ accessToken: string }>;
-      accessToken = json.data.accessToken;
-      return accessToken;
+      if (!res.ok) {
+        setSession(null);
+        return null;
+      }
+      const json = (await res.json()) as ApiSuccess<Session>;
+      setSession(json.data);
+      return json.data.user;
     })
-    .catch(() => null)
+    .catch(() => {
+      // Network trouble is not a sign-out; keep whatever we had, but leave `unknown` behind.
+      if (useSessionStore.getState().status === 'unknown') useSessionStore.getState().setUser(null);
+      return null;
+    })
     .finally(() => {
       refreshPromise = null;
     });

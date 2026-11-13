@@ -1,14 +1,15 @@
 /**
- * Shared plumbing for anonymous community posts (jobs, buy & sell, to-let, car rent, tuition).
- * They all follow one contract: no accounts, a 4–6 digit PIN gates edit / delete / mark-done,
- * posts auto-expire, and anyone can report one.
+ * Shared plumbing for community posts (jobs, buy & sell, to-let, car rent, tuition).
+ * They all follow one contract: reading is open to everyone; posting needs a social sign-in
+ * (Google / Facebook / Apple — the first sign-in creates the account), and only the post's
+ * owner can edit / delete / mark it done. Posts auto-expire, and anyone can report one.
  *
- *   GET    {base}?search&page&limit&…filters   → paginated list
- *   GET    {base}/:id                          → one post
- *   POST   {base}                              → create (body includes `pin`)
- *   PATCH  {base}/:id                          → update (body includes `pin`)
- *   POST   {base}/:id/manage  { pin, action }  → delete | mark-done
- *   POST   {base}/:id/report  { reason, note } → report
+ *   GET    {base}?search&page&limit&…filters   → paginated list (public)
+ *   GET    {base}/:id                          → one post (public)
+ *   POST   {base}                              → create (signed in; server sets `ownerId`)
+ *   PATCH  {base}/:id                          → update (owner only)
+ *   POST   {base}/:id/manage  { action }       → delete | mark-done (owner only)
+ *   POST   {base}/:id/report  { reason, note } → report (public)
  */
 import {
   keepPreviousData,
@@ -19,7 +20,7 @@ import {
 } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { api } from './api-client';
-import type { ListParams, Paginated, PinAction, ReportInput, Submission } from '@/types/api';
+import type { ListParams, ManageAction, Paginated, ReportInput, Submission } from '@/types/api';
 
 export const PAGE_SIZE = 12;
 
@@ -40,8 +41,8 @@ export function createCommunityApi<T, C, P extends ListParams>(base: string) {
       api.getPaginated<T>(base, { limit: PAGE_SIZE, ...(params as unknown as Record<string, string | number | boolean | undefined>) }, signal),
     get: (id: string, signal?: AbortSignal) => api.get<T>(`${base}/${id}`, undefined, signal),
     create: (input: C) => api.post<Submission>(base, input),
-    update: (id: string, input: Partial<C> & { pin: string }) => api.patch<T>(`${base}/${id}`, input),
-    manage: (id: string, body: PinAction) => api.post<{ ok: true }>(`${base}/${id}/manage`, body),
+    update: (id: string, input: Partial<C>) => api.patch<T>(`${base}/${id}`, input),
+    manage: (id: string, body: ManageAction) => api.post<{ ok: true }>(`${base}/${id}/manage`, body),
     report: (id: string, body: ReportInput) => api.post<{ ok: true }>(`${base}/${id}/report`, body),
   };
 }
@@ -81,6 +82,7 @@ export function createCommunityHooks<T, C, P extends ListParams, CI = C>(
         mutationFn: (input: CI) => (createFn ? createFn(input) : postApi.create(input as unknown as C)),
         onSuccess: () => {
           qc.invalidateQueries({ queryKey: keys.lists() });
+          qc.invalidateQueries({ queryKey: ['me'] });
           toast.success(labels.created);
         },
       });
@@ -89,9 +91,10 @@ export function createCommunityHooks<T, C, P extends ListParams, CI = C>(
     useManage: () => {
       const qc = useQueryClient();
       return useMutation({
-        mutationFn: ({ id, ...body }: PinAction & { id: string }) => postApi.manage(id, body),
+        mutationFn: ({ id, ...body }: ManageAction & { id: string }) => postApi.manage(id, body),
         onSuccess: (_d, v) => {
           qc.invalidateQueries({ queryKey: keys.all });
+          qc.invalidateQueries({ queryKey: ['me'] });
           toast.success(v.action === 'delete' ? 'পোস্টটি মুছে ফেলা হয়েছে' : (labels.doneLabel ?? 'পোস্টটি হালনাগাদ হয়েছে'));
         },
       });

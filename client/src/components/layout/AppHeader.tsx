@@ -11,6 +11,7 @@ import { IconButton } from '@/components/ui/Button';
 import { Chip } from '@/components/ui/Chip';
 import { Icon } from '@/components/ui/Icon';
 import { Wordmark } from '@/components/ui/Misc';
+import { AccountButton } from '@/features/auth';
 
 const NAV = [
   { label: 'হোম', href: '/' },
@@ -66,6 +67,7 @@ export function AppHeader() {
         <div className="bb-header-actions">
           <IconButton icon="search" label="খুঁজুন" href="/search" />
           <ThemeToggle />
+          <AccountButton />
           <IconButton icon="menu" label="মেনু" className="bb-header-menu" onClick={() => setMenuOpen(true)} />
         </div>
       </div>

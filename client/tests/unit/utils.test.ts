@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { banglaDate, bn, bnNumber, daysSince, formatPhone, greeting, latin, money, telHref, waHref } from '@/lib/utils';
-import { phoneField, pinField } from '@/lib/validation';
+import { phoneField } from '@/lib/validation';
+import { safeReturnTo } from '@/features/auth/api/auth.api';
 
 describe('Bangla numerals', () => {
   it('converts both ways', () => {
@@ -47,9 +48,13 @@ describe('form fields', () => {
     expect(phoneField.parse('০১৭১২৩৪৫৬৭৮')).toBe('01712345678');
     expect(phoneField.safeParse('12345').success).toBe(false);
   });
-  it('PIN must be 4–6 digits', () => {
-    expect(pinField.parse('৪৪৫৫')).toBe('4455');
-    expect(pinField.safeParse('123').success).toBe(false);
-    expect(pinField.safeParse('1234567').success).toBe(false);
+});
+
+describe('sign-in return path', () => {
+  it('only returns to paths on this site', () => {
+    expect(safeReturnTo('/jobs/new')).toBe('/jobs/new');
+    expect(safeReturnTo('/to-let/new?step=2')).toBe('/to-let/new?step=2');
+    expect(safeReturnTo('//evil.example')).toBe('/');
+    expect(safeReturnTo('https://evil.example')).toBe('/');
   });
 });

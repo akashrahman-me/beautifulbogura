@@ -1,18 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { ApiError } from '@/lib/api-client';
-import type { PinAction, ReportInput } from '@/types/api';
+import type { ManageAction, ReportInput } from '@/types/api';
 import { Button } from '@/components/ui/Button';
 import { ChoiceGroup, Dialog } from '@/components/ui/Interactive';
 import { TextArea } from '@/components/ui/Field';
-import { PinInput } from '@/components/ui/PinInput';
+import { Alert } from '@/components/ui/Misc';
 
 /**
- * Unlock an anonymous post with its PIN: mark done (rented / sold) or delete.
- * Delete asks a second time before it happens.
+ * Owner's controls for their own post: mark done (rented / sold) or delete.
+ * Only rendered for the signed-in owner; delete asks a second time before it happens.
  */
-export function PinManageDialog({
+export function ManageDialog({
   open,
   onOpenChange,
   onSubmit,
@@ -21,44 +20,41 @@ export function PinManageDialog({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (body: PinAction, opts: { onSuccess: () => void; onError: (e: Error) => void }) => void;
+  onSubmit: (body: ManageAction, opts: { onSuccess: () => void; onError: (e: Error) => void }) => void;
   pending: boolean;
   /** e.g. “ভাড়া হয়ে গেছে”; omit when a post has no done state. */
   doneLabel?: string;
 }) {
-  const [pin, setPin] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const close = (o: boolean) => {
     onOpenChange(o);
     if (!o) {
-      setPin('');
       setError(null);
       setConfirmDelete(false);
     }
   };
-  const run = (action: PinAction['action']) =>
+  const run = (action: ManageAction['action']) =>
     onSubmit(
-      { pin, action },
+      { action },
       {
         onSuccess: () => close(false),
         onError: (e) => {
           setConfirmDelete(false);
-          setError(e instanceof ApiError && e.code === 'INVALID_PIN' ? 'পিন মেলেনি। আবার চেষ্টা করুন।' : e.message);
+          setError(e.message);
         },
       },
     );
-  const ready = pin.length >= 4;
 
   return (
     <Dialog
       open={open}
       onOpenChange={close}
-      icon={confirmDelete ? 'trash' : 'lock'}
+      icon={confirmDelete ? 'trash' : 'edit'}
       tone={confirmDelete ? 'emergency' : undefined}
-      title={confirmDelete ? 'পোস্টটি মুছে ফেলবেন?' : 'পিন দিয়ে পোস্ট পরিচালনা'}
-      description={confirmDelete ? 'মুছে ফেলা পোস্ট আর ফিরিয়ে আনা যাবে না।' : 'পোস্ট দেওয়ার সময় যে পিন দিয়েছিলেন, সেটি লিখুন।'}
+      title={confirmDelete ? 'পোস্টটি মুছে ফেলবেন?' : 'পোস্ট পরিচালনা'}
+      description={confirmDelete ? 'মুছে ফেলা পোস্ট আর ফিরিয়ে আনা যাবে না।' : 'আপনার সব পোস্ট ‘আমার অ্যাকাউন্ট’ থেকেও সামলাতে পারবেন।'}
       actions={
         confirmDelete ? (
           <>
@@ -72,31 +68,18 @@ export function PinManageDialog({
         ) : (
           <>
             {doneLabel && (
-              <Button variant="primary" iconLeft="check" block disabled={!ready} loading={pending} onClick={() => run('mark-done')}>
+              <Button variant="primary" iconLeft="check" block loading={pending} onClick={() => run('mark-done')}>
                 {doneLabel}
               </Button>
             )}
-            <Button variant="danger-ghost" iconLeft="trash" block disabled={!ready || pending} onClick={() => setConfirmDelete(true)}>
+            <Button variant="danger-ghost" iconLeft="trash" block disabled={pending} onClick={() => setConfirmDelete(true)}>
               মুছে ফেলুন
             </Button>
           </>
         )
       }
     >
-      {!confirmDelete && (
-        <PinInput
-          label="আপনার পিন"
-          length={4}
-          mask
-          value={pin}
-          onChange={(v) => {
-            setPin(v);
-            setError(null);
-          }}
-          error={error}
-          hint="পিন ভুলে গেলে অ্যাডমিনের সাথে যোগাযোগ করুন।"
-        />
-      )}
+      {error && <Alert tone="danger" title={error} />}
     </Dialog>
   );
 }

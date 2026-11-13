@@ -36,15 +36,8 @@ project/
 │   ├── app/                              # Routing only
 │   │   ├── (public)/                     # Landing, marketing
 │   │   │   └── page.tsx
-│   │   ├── (auth)/                       # Guest-only screens
-│   │   │   ├── login/page.tsx
-│   │   │   ├── register/page.tsx
-│   │   │   └── layout.tsx
-│   │   ├── (dashboard)/                  # Authenticated screens
-│   │   │   ├── users/
-│   │   │   │   ├── page.tsx
-│   │   │   │   └── [id]/page.tsx
-│   │   │   └── layout.tsx                # AuthGuard + sidebar/header
+│   │   ├── account/page.tsx              # Profile, sign out, “my posts” (no login/register pages:
+│   │   │                                 #   social sign-in creates the account on first use)
 │   │   ├── layout.tsx                    # Root layout, <Providers>
 │   │   ├── error.tsx
 │   │   ├── not-found.tsx
@@ -52,11 +45,12 @@ project/
 │   │
 │   ├── features/
 │   │   ├── auth/
-│   │   │   ├── api/auth.api.ts
-│   │   │   ├── hooks/useLogin.ts, useLogout.ts, useMe.ts
-│   │   │   ├── components/LoginForm.tsx, AuthGuard.tsx, AuthBootstrap.tsx
-│   │   │   ├── schemas/auth.schema.ts
-│   │   │   └── store/auth.store.ts
+│   │   │   ├── api/auth.api.ts           # signIn(provider) redirect, signOut, /me/posts
+│   │   │   ├── hooks/useAuth.ts          # useSignIn, useSignOut, useMyPosts, useManageMyPost
+│   │   │   ├── components/SignInOptions.tsx, SignInDialog.tsx, RequireSignIn.tsx,
+│   │   │   │              AccountButton.tsx, AccountPage.tsx, AuthBootstrap.tsx
+│   │   │   └── schemas/auth.schema.ts    # providers, post kinds, MyPost
+│   │   │   (session state: src/stores/session.store.ts, shared with components/shared)
 │   │   └── user/
 │   │       ├── api/user.api.ts           # Raw API calls
 │   │       ├── api/user.keys.ts          # Query key factory
@@ -233,7 +227,7 @@ export const api = {
 };
 ```
 
-This assumes `POST /auth/refresh` returns `{ data: { accessToken } }` and the refresh token is an httpOnly cookie. Adjust if your auth module differs.
+The snippet above is the general shape. In this project `POST /auth/refresh` returns `{ data: { accessToken, user } }` and the client exposes `setSession(session | null)` instead of `setAccessToken`, so the token (memory) and the visible profile (`session.store`) always change together. See §8.
 
 ---
 
@@ -289,9 +283,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
   return (
     <QueryClientProvider client={queryClient}>
-      <NuqsAdapter>
-        <AuthBootstrap>{children}</AuthBootstrap>
-      </NuqsAdapter>
+      <NuqsAdapter>{children}</NuqsAdapter>
+      <AuthBootstrap /> {/* restores the session once on load */}
       <Toaster richColors />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
@@ -637,117 +630,34 @@ export function UserListSkeleton({ count = 8 }: { count?: number }) {
 
 ---
 
-## 8. Authentication
+## 8. Authentication (social sign-in)
+
+Reading is open to everyone. Anything that **creates something owned by a person** (community posts: jobs, buy & sell, to-let, car rent, tuition) needs a signed-in user. There are no passwords, no PINs and no sign-up page: the user picks **Google, Facebook or Apple**, and the first sign-in creates the account.
 
 **Flow**
 
-1. Login: `POST /auth/login` returns an access token in the body and sets the refresh token as an httpOnly cookie.
-2. The access token is held in memory by the API client. It is lost on page reload by design.
-3. On app start, `AuthBootstrap` calls refresh once to restore the session, then loads `/auth/me`.
-4. Any 401 triggers one silent refresh and a retry (handled in the API client).
-5. Logout: `POST /auth/logout`, clear the token, clear the query cache.
-
-```ts
-// features/auth/store/auth.store.ts
-import { create } from 'zustand';
-
-type Status = 'loading' | 'authenticated' | 'guest';
-
-interface AuthState {
-  status: Status;
-  setStatus: (status: Status) => void;
-}
-
-export const useAuthStore = create<AuthState>((set) => ({
-  status: 'loading',
-  setStatus: (status) => set({ status }),
-}));
-```
+1. A signed-out visitor opens a “post” form. `RequireSignIn` shows the provider buttons *before* the form, so nothing typed is lost on the provider round-trip.
+2. `signIn(provider)` does a full-page navigation to `GET {API}/auth/:provider?returnTo=/jobs/new`. The API runs the OAuth / OpenID Connect flow (state + PKCE), upserts the user by `(provider, providerUserId)`, sets the **refresh token as an httpOnly cookie** and redirects back to `returnTo` (same-site paths only). On failure it redirects to `/?authError=<code>`.
+3. On app start, `AuthBootstrap` calls `POST /auth/refresh` once. The response `{ accessToken, user }` goes through `setSession()`: token in memory, profile in `useSessionStore` (`unknown → signed-in | signed-out`).
+4. Any 401 triggers one silent refresh and a retry (API client). A failed refresh signs the user out locally.
+5. Ownership: the API stamps `ownerId` on create and only the owner may `PATCH` or `POST …/manage` (403 `NOT_OWNER`). The UI shows “পোস্ট পরিচালনা” only when `user.id === post.ownerId`, and `/account` lists everything the user owns (`GET /me/posts`).
+6. Sign out: `POST /auth/logout` clears the cookie; the client calls `setSession(null)` and drops the `['me']` queries. Post lists are public data, so they stay cached.
 
 ```tsx
-// features/auth/components/AuthBootstrap.tsx
-'use client';
+// a post form
+<RequireSignIn>
+  <form onSubmit={submit}>…</form>
+</RequireSignIn>
 
-import { useEffect } from 'react';
-import { refreshAccessToken } from '@/lib/api-client';
-import { useAuthStore } from '../store/auth.store';
-
-export function AuthBootstrap({ children }: { children: React.ReactNode }) {
-  const setStatus = useAuthStore((s) => s.setStatus);
-
-  useEffect(() => {
-    refreshAccessToken().then((token) => setStatus(token ? 'authenticated' : 'guest'));
-  }, [setStatus]);
-
-  return <>{children}</>;
-}
+// owner controls on a post
+<PostActions id={post.id} ownerId={post.ownerId} manage={manage} report={report} doneLabel="ভাড়া হয়ে গেছে" />
 ```
 
-```ts
-// features/auth/hooks/useMe.ts  (the user object lives in the query cache, not in Zustand)
-import { useQuery } from '@tanstack/react-query';
-import { api } from '@/lib/api-client';
-import { useAuthStore } from '../store/auth.store';
-import type { User } from '@/features/user';
+**Demo mode** (`NEXT_PUBLIC_DATA_MODE=demo`) has no provider to redirect to: `signIn` calls `POST /auth/demo/sign-in` on the in-browser fake, which signs in a fixed demo user and keeps the session in localStorage so reloads stay signed in. The first seeded post of each kind belongs to that user.
 
-export const authKeys = { me: ['auth', 'me'] as const };
+**Cookie and domain note:** the refresh cookie belongs to the API's domain. Host the frontend and API on the same site (`example.com` and `api.example.com`) so the cookie is sent with `sameSite: 'lax'`. On unrelated domains you need `sameSite: 'none'; secure`, which some browsers block.
 
-export const useMe = () => {
-  const status = useAuthStore((s) => s.status);
-  return useQuery({
-    queryKey: authKeys.me,
-    queryFn: () => api.get<User>('/auth/me'),
-    enabled: status === 'authenticated',
-    staleTime: Infinity,
-  });
-};
-```
-
-```tsx
-// features/auth/components/AuthGuard.tsx
-'use client';
-
-import { useEffect } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useAuthStore } from '../store/auth.store';
-import { DashboardSkeleton } from '@/components/layout/DashboardSkeleton';
-
-export function AuthGuard({ children }: { children: React.ReactNode }) {
-  const status = useAuthStore((s) => s.status);
-  const router = useRouter();
-  const pathname = usePathname();
-
-  useEffect(() => {
-    if (status === 'guest') router.replace(`/login?next=${encodeURIComponent(pathname)}`);
-  }, [status, router, pathname]);
-
-  if (status !== 'authenticated') return <DashboardSkeleton />;
-  return <>{children}</>;
-}
-```
-
-```tsx
-// app/(dashboard)/layout.tsx
-import { AuthGuard } from '@/features/auth';
-import { Sidebar } from '@/components/layout/Sidebar';
-
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <AuthGuard>
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <main className="flex-1 p-6">{children}</main>
-      </div>
-    </AuthGuard>
-  );
-}
-```
-
-**Logout must clear the cache:** `setAccessToken(null); queryClient.clear(); setStatus('guest')`. Otherwise the next user on the same browser sees the previous user's cached data.
-
-**Cookie and domain note:** the refresh cookie belongs to the API's domain. Host the frontend and API on the same site (`app.example.com` and `api.example.com`) so the cookie is sent with `sameSite: 'lax'`. On unrelated domains you need `sameSite: 'none'; secure`, which some browsers block. `proxy.ts` can only do an early redirect if the cookie is visible to the Next.js domain, so treat `AuthGuard` as the real guard and `proxy.ts` as an optional speed-up.
-
-**The frontend guard is for user experience only.** Real access control is the API rejecting requests.
+**The frontend guard is for user experience only.** Real access control is the API rejecting requests without a valid token or from a non-owner.
 
 ---
 
@@ -823,7 +733,7 @@ Switch on `error.code`, never on `error.message`. Codes are stable; messages can
 |---|---|---|
 | Server data | TanStack Query | Users, posts, current user profile |
 | URL state | nuqs | Page number, search, filters, sort, active tab |
-| Global client state | Zustand | Auth status, sidebar open, theme |
+| Global client state | Zustand | Session (signed-in user), recently viewed, favourites |
 | Local UI state | `useState` | Modal open, input value, hover |
 | Form state | React Hook Form | Field values, errors, dirty |
 
@@ -898,7 +808,7 @@ Anything prefixed `NEXT_PUBLIC_` ships to the browser. No secrets there.
 | API module | `<feature>.api.ts` | `user.api.ts` |
 | Query keys | `<feature>.keys.ts` | `user.keys.ts` |
 | Schema | `<feature>.schema.ts` | `user.schema.ts` |
-| Store | `<name>.store.ts` | `auth.store.ts` |
+| Store | `<name>.store.ts` | `session.store.ts` |
 | Route folders | kebab-case | `app/(dashboard)/order-history/` |
 | Feature folders | singular | `features/user/` |
 
@@ -948,7 +858,7 @@ Use named exports everywhere except `page.tsx`, `layout.tsx`, `error.tsx`, `load
 |---|---|---|
 | Unit | Vitest | Utils, schemas, stores |
 | Component | Vitest + Testing Library + MSW | Feature components with mocked API, including skeleton and error states |
-| End-to-end | Playwright | Login, core flows against a running API |
+| End-to-end | Playwright | Sign-in (demo mode), posting, core flows against a running API |
 
 In component tests, wrap with a fresh `QueryClient` per test and set `retry: false`.
 

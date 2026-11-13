@@ -31,9 +31,25 @@ export interface ListParams {
   search?: string;
 }
 
-/** Body for PIN-gated actions on anonymous community posts. */
-export interface PinAction {
-  pin: string;
+/** Social sign-in providers. Signing in the first time creates the account; there is no separate sign-up. */
+export type AuthProvider = 'google' | 'facebook' | 'apple';
+
+export interface SessionUser {
+  id: string;
+  name: string;
+  email: string | null;
+  avatar: string | null;
+  provider: AuthProvider;
+}
+
+/** What `/auth/refresh` returns: a short-lived access token (kept in memory) and who it belongs to. */
+export interface Session {
+  accessToken: string;
+  user: SessionUser;
+}
+
+/** Owner-only actions on a community post. The server checks ownership from the session. */
+export interface ManageAction {
   action: 'delete' | 'mark-done';
 }
 

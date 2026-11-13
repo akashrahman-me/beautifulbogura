@@ -30,7 +30,7 @@ export function JobList() {
         }
       />
       <NoticeBanner>
-        <p>বিজ্ঞাপন দিতে কোনো অ্যাকাউন্ট লাগে না। পোস্ট করার সময় একটি পিন দিন — সেই পিন দিয়ে পরে বিজ্ঞাপন মুছে ফেলতে বা ‘নিয়োগ সম্পন্ন’ করতে পারবেন। চাকরির জন্য টাকা চাওয়া হলে রিপোর্ট করুন।</p>
+        <p>বিজ্ঞাপন দিতে Google, Facebook বা Apple দিয়ে সাইন ইন করুন — আলাদা অ্যাকাউন্ট খুলতে হয় না। পরে ‘আমার অ্যাকাউন্ট’ থেকে বিজ্ঞাপন মুছে ফেলতে বা ‘নিয়োগ সম্পন্ন’ করতে পারবেন। চাকরির জন্য টাকা চাওয়া হলে রিপোর্ট করুন।</p>
       </NoticeBanner>
       <FilterBar query={q} onQuery={(v) => void setQ(v || null)} placeholder="প্রতিষ্ঠান, পদ বা এলাকা" count={list.isPending ? undefined : totalOf(list.data)} countLabel="টি সক্রিয় বিজ্ঞাপন" onClear={q ? () => void setQ(null) : undefined} />
       {list.isPending ? (

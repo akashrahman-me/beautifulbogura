@@ -34,7 +34,7 @@ function ListingItem({ item, now }: { item: Listing; now: Date | null }) {
       image={item.images[0]}
       icon="tag"
       closedLabel={item.status === 'sold' ? 'বিক্রি হয়েছে' : undefined}
-      footer={<PostActions id={item.id} manage={manage} report={report} doneLabel="বিক্রি হয়ে গেছে" />}
+      footer={<PostActions id={item.id} ownerId={item.ownerId} manage={manage} report={report} doneLabel="বিক্রি হয়ে গেছে" />}
     />
   );
 }
@@ -57,7 +57,7 @@ export function ListingList() {
         action={<Button href="/buy-sell/new" iconLeft="plus">বিক্রি করুন</Button>}
       />
       <NoticeBanner>
-        <p>টাকা দেওয়ার আগে পণ্য নিজে দেখে নিন। অগ্রিম টাকা চাইলে সতর্ক থাকুন এবং ‘রিপোর্ট’ করুন। বিক্রি হয়ে গেলে পিন দিয়ে ‘বিক্রি হয়ে গেছে’ চিহ্নিত করুন।</p>
+        <p>টাকা দেওয়ার আগে পণ্য নিজে দেখে নিন। অগ্রিম টাকা চাইলে সতর্ক থাকুন এবং ‘রিপোর্ট’ করুন। বিক্রি হয়ে গেলে ‘আমার অ্যাকাউন্ট’ থেকে ‘বিক্রি হয়ে গেছে’ চিহ্নিত করুন।</p>
       </NoticeBanner>
       <FilterBar
         query={q}

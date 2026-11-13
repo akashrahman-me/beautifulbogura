@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { honeypot, phoneField, pinField, takaField } from '@/lib/validation';
+import { honeypot, phoneField, takaField } from '@/lib/validation';
 import type { ListParams } from '@/types/api';
 
 export const RENTAL_TYPES = [['flat', 'ফ্ল্যাট'], ['tin-shed', 'টিনশেড বাড়ি'], ['sublet', 'সাবলেট'], ['mess', 'মেস'], ['hostel', 'হোস্টেল'], ['office', 'অফিস'], ['shop', 'দোকান']] as const;
@@ -21,6 +21,8 @@ export interface Rental {
   address: string;
   mapUrl: string;
   images: string[];
+  /** Set by the server from the signed-in poster; only they can manage the post. */
+  ownerId: string;
   createdAt: string;
   status: 'active' | 'rented' | 'deleted';
   featured: boolean;
@@ -35,7 +37,6 @@ export const createRentalSchema = z.object({
   ownerName: z.string().trim().min(2, 'মালিকের নাম লিখুন'),
   phone: phoneField,
   whatsapp: z.boolean(),
-  pin: pinField,
   type: z.enum(RENTAL_TYPES.map(([v]) => v) as [RentalType, ...RentalType[]], { message: 'ধরন বেছে নিন' }),
   rent: takaField('মাসিক ভাড়া লিখুন'),
   rooms: z.string().transform((v) => Number(v)).refine((n) => n >= 1 && n <= 20, 'রুমের সংখ্যা দিন'),
@@ -51,7 +52,7 @@ export const createRentalSchema = z.object({
 export type CreateRentalIn = z.input<typeof createRentalSchema>;
 export type CreateRentalInput = z.output<typeof createRentalSchema>;
 export const RENTAL_STEPS = [
-  ['ownerName', 'phone', 'whatsapp', 'pin'],
+  ['ownerName', 'phone', 'whatsapp'],
   ['type', 'rent', 'rooms', 'gas', 'attachedBath', 'title', 'description', 'address', 'mapUrl'],
   ['images'],
 ] as const;

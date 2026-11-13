@@ -8,7 +8,6 @@ import { useNow } from '@/hooks/useNow';
 import { flatPages, totalOf } from '@/lib/community';
 import { applyApiErrors } from '@/lib/form';
 import { bn, cn, timeAgo } from '@/lib/utils';
-import { PIN_HINT } from '@/lib/validation';
 import { useFavourites, useLocalStore } from '@/stores/local.store';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -16,8 +15,8 @@ import { Checkbox, TextArea, TextField } from '@/components/ui/Field';
 import { Icon } from '@/components/ui/Icon';
 import { ChoiceGroup } from '@/components/ui/Interactive';
 import { Alert, Avatar } from '@/components/ui/Misc';
-import { PinInput } from '@/components/ui/PinInput';
 import { Tabs } from '@/components/ui/Tabs';
+import { RequireSignIn } from '@/features/auth';
 import { ContactActions, LoadMore, NoticeBanner, PageHeader, PhoneLink } from '@/components/shared/Blocks';
 import { PostActions } from '@/components/shared/PostActions';
 import { PostedSuccess } from '@/components/shared/PostedSuccess';
@@ -53,7 +52,7 @@ function VehicleCard({ v, fav, onFav, now }: { v: Vehicle; fav: boolean; onFav: 
         <PhoneLink phone={v.phone} />
         <ContactActions phone={v.phone} whatsapp={v.whatsapp} compact />
       </div>
-      <PostActions id={v.id} manage={manage} report={report} />
+      <PostActions id={v.id} ownerId={v.ownerId} manage={manage} report={report} />
     </article>
   );
 }
@@ -106,29 +105,30 @@ export function VehicleForm() {
   const [done, setDone] = useState(false);
   const form = useForm<CreateVehicleIn, unknown, CreateVehicleInput>({
     resolver: zodResolver(createVehicleSchema),
-    defaultValues: { ownerName: '', description: '', phone: '', whatsapp: true, pin: '', website: '' },
+    defaultValues: { ownerName: '', description: '', phone: '', whatsapp: true, website: '' },
   });
   const { errors } = form.formState;
   const submit = form.handleSubmit((v) => create.mutate(v, { onSuccess: () => setDone(true), onError: (e) => applyApiErrors(form, e) }));
   return (
     <div className="container-narrow flex flex-col gap-5">
-      <PageHeader eyebrow="গাড়ি ভাড়া" title="গাড়ির তথ্য দিন" back={{ href: '/car-rent', label: 'গাড়ি ভাড়া' }} description="কোনো অ্যাকাউন্ট লাগে না। ফিচার্ড বা যাচাইকৃত হতে অ্যাডমিনের সাথে যোগাযোগ করুন।" />
+      <PageHeader eyebrow="গাড়ি ভাড়া" title="গাড়ির তথ্য দিন" back={{ href: '/car-rent', label: 'গাড়ি ভাড়া' }} description="সাইন ইন করে পোস্ট দিন। ফিচার্ড বা যাচাইকৃত হতে অ্যাডমিনের সাথে যোগাযোগ করুন।" />
       {done ? (
         <PostedSuccess title="গাড়ির তথ্য প্রকাশিত হয়েছে" href="/car-rent" listLabel="গাড়ি ভাড়া দেখুন" />
       ) : (
-        <form onSubmit={submit} noValidate className="flex flex-col gap-5 rounded-lg border border-line bg-surface p-5">
-          <Controller control={form.control} name="type" render={({ field }) => <ChoiceGroup required label="গাড়ির ধরন" options={VEHICLE_TYPES.map(([value, label]) => ({ value, label }))} value={field.value ?? ''} onChange={field.onChange} error={errors.type?.message} />} />
-          <TextField label="মালিক বা চালকের নাম" required {...form.register('ownerName')} error={errors.ownerName?.message} />
-          <TextArea label="বিবরণ" required rows={3} placeholder="যেমন: টয়োটা নোয়া, ৭ সিট, এসি। বিয়ে, পিকনিক ও ঢাকা ট্রিপ।" {...form.register('description')} error={errors.description?.message} />
-          <TextField label="মোবাইল নম্বর" required inputMode="tel" icon="phone" {...form.register('phone')} error={errors.phone?.message} />
-          <Controller control={form.control} name="whatsapp" render={({ field }) => <Checkbox label="এই নম্বরে হোয়াটসঅ্যাপ আছে" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />} />
-          <Controller control={form.control} name="pin" render={({ field }) => <PinInput required label="একটি পিন ঠিক করুন" value={field.value} onChange={field.onChange} hint={PIN_HINT} error={errors.pin?.message} />} />
-          <input type="text" tabIndex={-1} autoComplete="off" aria-hidden className="bb-sr" {...form.register('website')} />
-          {errors.root && <Alert tone="danger" title={errors.root.message} />}
-          <Button type="submit" size="lg" block loading={create.isPending} iconLeft="check">
-            প্রকাশ করুন
-          </Button>
-        </form>
+        <RequireSignIn>
+          <form onSubmit={submit} noValidate className="flex flex-col gap-5 rounded-lg border border-line bg-surface p-5">
+            <Controller control={form.control} name="type" render={({ field }) => <ChoiceGroup required label="গাড়ির ধরন" options={VEHICLE_TYPES.map(([value, label]) => ({ value, label }))} value={field.value ?? ''} onChange={field.onChange} error={errors.type?.message} />} />
+            <TextField label="মালিক বা চালকের নাম" required {...form.register('ownerName')} error={errors.ownerName?.message} />
+            <TextArea label="বিবরণ" required rows={3} placeholder="যেমন: টয়োটা নোয়া, ৭ সিট, এসি। বিয়ে, পিকনিক ও ঢাকা ট্রিপ।" {...form.register('description')} error={errors.description?.message} />
+            <TextField label="মোবাইল নম্বর" required inputMode="tel" icon="phone" {...form.register('phone')} error={errors.phone?.message} />
+            <Controller control={form.control} name="whatsapp" render={({ field }) => <Checkbox label="এই নম্বরে হোয়াটসঅ্যাপ আছে" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />} />
+            <input type="text" tabIndex={-1} autoComplete="off" aria-hidden className="bb-sr" {...form.register('website')} />
+            {errors.root && <Alert tone="danger" title={errors.root.message} />}
+            <Button type="submit" size="lg" block loading={create.isPending} iconLeft="check">
+              প্রকাশ করুন
+            </Button>
+          </form>
+        </RequireSignIn>
       )}
     </div>
   );

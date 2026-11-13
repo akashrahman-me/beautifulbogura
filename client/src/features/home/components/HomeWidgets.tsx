@@ -70,7 +70,7 @@ interface Slide {
 const SLIDES: Slide[] = [
   { tone: 'brand', icon: 'grid', eyebrow: 'স্বাগতম', title: 'এক জায়গায় বগুড়ার সব সেবা', body: 'ডাক্তার, পুলিশ, স্কুল, ব্যাংক — সব তথ্য আর ফোন নম্বর হাতের কাছে।', cta: { label: 'সেবাগুলো দেখুন', href: '/services' } },
   { tone: 'emergency', icon: 'drop', eyebrow: 'রক্ত ব্যাংক', title: 'রক্ত লাগবে? দাতা খুঁজুন', body: 'গ্রুপ বেছে নিন, প্রস্তুত দাতাকে সরাসরি কল করুন।', cta: { label: 'দাতার তালিকা', href: '/blood-bank' } },
-  { tone: 'accent', icon: 'briefcase', eyebrow: 'চাকরি ও কেনাবেচা', title: 'স্থানীয় চাকরি আর বিজ্ঞাপন', body: 'কোনো অ্যাকাউন্ট লাগে না — পিন দিয়ে নিজের পোস্ট নিজেই সামলান।', cta: { label: 'চাকরি দেখুন', href: '/jobs' } },
+  { tone: 'accent', icon: 'briefcase', eyebrow: 'চাকরি ও কেনাবেচা', title: 'স্থানীয় চাকরি আর বিজ্ঞাপন', body: 'Google, Facebook বা Apple দিয়ে এক ক্লিকে সাইন ইন — নিজের সব পোস্ট এক জায়গা থেকে সামলান।', cta: { label: 'চাকরি দেখুন', href: '/jobs' } },
   { tone: 'gold', icon: 'tree', eyebrow: 'ভ্রমণ', title: 'মহাস্থানগড় থেকে করতোয়ার পাড়', cta: { label: 'দর্শনীয় স্থান', href: '/directory/tourist-spot' } },
 ];
 

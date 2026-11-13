@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { useEffect } from 'react';
 import { Toaster } from 'sonner';
+import { AuthBootstrap } from '@/features/auth';
 import { getQueryClient } from '@/lib/query-client';
 import { useLocalStore } from '@/stores/local.store';
 
@@ -22,6 +23,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
         <NuqsAdapter>{children}</NuqsAdapter>
         <RehydrateLocal />
+        <AuthBootstrap />
         <Toaster
           position="bottom-center"
           offset={88}

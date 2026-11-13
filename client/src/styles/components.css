@@ -206,13 +206,6 @@
 .bb-check-desc { font-size: 13px; line-height: 20px; color: var(--ink-muted); }
 .bb-check.is-disabled { opacity: .48; cursor: not-allowed; }
 
-.bb-pin { display: flex; gap: var(--space-2); }
-.bb-pin-cell { width: 52px; height: 60px; text-align: center; font-family: var(--font-display); font-size: 26px; font-weight: 700; color: var(--ink);
-  background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-md); outline: none; box-shadow: var(--shadow-xs); }
-.bb-pin-cell:focus { border-color: var(--brand); outline: 2px solid var(--focus); outline-offset: 2px; }
-.bb-pin-cell.is-filled { background: var(--brand-soft); border-color: var(--brand); }
-.has-error .bb-pin-cell { border-color: var(--emergency); }
-
 .bb-drop { display: flex; flex-direction: column; align-items: center; gap: var(--space-1); padding: var(--space-6) var(--space-4); text-align: center;
   border: 1.5px dashed var(--line-strong); border-radius: var(--radius-lg); background: var(--surface); cursor: pointer; transition: background-color .15s ease-out, border-color .15s ease-out; }
 .bb-drop:hover, .bb-drop.is-over { border-color: var(--brand); background: var(--brand-soft); }

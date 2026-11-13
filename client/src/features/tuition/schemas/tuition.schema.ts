@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { honeypot, phoneField, pinField } from '@/lib/validation';
+import { honeypot, phoneField } from '@/lib/validation';
 import type { ListParams } from '@/types/api';
 
 export const TUITION_KINDS = [['need-teacher', 'শিক্ষক চাই'], ['want-to-teach', 'পড়াতে চাই']] as const;
@@ -17,6 +17,8 @@ export interface Tuition {
   address: string;
   note: string;
   photo: string | null;
+  /** Set by the server from the signed-in poster; only they can manage the post. */
+  ownerId: string;
   createdAt: string;
   status: 'active' | 'done' | 'deleted';
 }
@@ -37,7 +39,6 @@ export const createTuitionSchema = z
     address: z.string().trim().min(2, 'এলাকা লিখুন'),
     note: z.string().trim().max(300).optional(),
     images: z.array(z.instanceof(File)).max(1),
-    pin: pinField,
     website: honeypot,
   })
   .refine((v) => v.kind !== 'want-to-teach' || (v.qualification ?? '').length > 1, { path: ['qualification'], message: 'শিক্ষাগত যোগ্যতা লিখুন' });

@@ -156,7 +156,7 @@ export function Dialog({
           <RDialog.Content
             className="bb-dialog"
             onOpenAutoFocus={(e) => {
-              // Land on the first field (PIN, date…) rather than the close button.
+              // Land on the first field (date, text…) rather than the close button.
               const field = (e.currentTarget as HTMLElement).querySelector<HTMLElement>('input:not([type=hidden]):not(.bb-sr), textarea, select');
               if (field) {
                 e.preventDefault();

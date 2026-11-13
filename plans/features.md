@@ -116,34 +116,34 @@ Each is a card list (photo, name, address, phone; tap-to-call; often "add your i
 
 ## 9. Community Marketplace & Classifieds
 
-All community posts share a common pattern: **no login; owner sets a 4–6 digit PIN** to later edit/delete/mark done; auto-expiry; report button; call + WhatsApp buttons.
+All community posts share a common pattern: **browse without an account; to post, sign in with Google, Facebook or Apple** (first sign-in creates the account — no sign-up page, no passwords, no PINs). The owner edits / deletes / marks done from the post itself or from **My account → My posts**; auto-expiry; report button; call + WhatsApp buttons.
 
 ### Jobs
 - Search by company / post / area; count of active listings
 - Card: company initial, days left / "expired" badge, title, vacancies, salary, summary, location, deadline → *details*
-- **Post job**: company, title, vacancies, salary, deadline, education, experience & details, contact number (+ "has WhatsApp" checkbox), address, image, listing duration (7/15/20/30 days), owner PIN
+- **Post job**: company, title, vacancies, salary, deadline, education, experience & details, contact number (+ "has WhatsApp" checkbox), address, image, listing duration (7/15/20/30 days)
 
 ### Buy & Sell
 - Search by product / area; category chips with counts
 - Card: condition (new/used/refurbished/parts), price ৳, posted-ago, category, title, description, seller, address, phone, WhatsApp, **Report**, **Edit / delete**
-- **Sell form** (2 steps): category (mobile, laptop, computer, motorcycle, TV, fridge, sound system, furniture, car, cycle, animals, land, flat…), product name, condition, price, description, multiple images → seller name, mobile, address, 4-digit PIN
+- **Sell form** (2 steps): category (mobile, laptop, computer, motorcycle, TV, fridge, sound system, furniture, car, cycle, animals, land, flat…), product name, condition, price, description, multiple images → seller name, mobile, address
 - **Report reasons**: fake/fraud, already sold, wrong info/photo, other
 
 ### House rent (To-Let)
 - Search by area; type filter (flat, tin-shed house, sublet, mess, hostel, office, shop); **favourites**; *load more*
 - Card: type, rent/month, description, rooms, gas yes/no, attached bath yes/no, owner, posted-ago, call / WhatsApp
-- **Post form** (3 steps): owner name, mobile, manage PIN → type, rent, rooms, gas, attached bath, address, Google Maps link → up to 5 photos (drag & drop)
-- Visible 30 days; owner can **mark as rented**; "manage your post" via PIN
+- **Post form** (3 steps): owner name, mobile → type, rent, rooms, gas, attached bath, address, Google Maps link → up to 5 photos (drag & drop)
+- Visible 30 days; owner can **mark as rented**; "manage your post" from the post or My account
 
 ### Car rent
 - Type tabs: Private car, Bus, Hiace, Truck, Other; **favourites**
-- Card badges: **Featured** (pinned top, via admin) and **Verified**; owner/driver, mobile, description, Call / WhatsApp / Report / Edit (PIN)
+- Card badges: **Featured** (pinned top, via admin) and **Verified**; owner/driver, mobile, description, Call / WhatsApp / Report / Manage (owner only)
 - Add vehicle info form
 
 ### Tuition
 - Tabs: All · *Teacher wanted* · *Want to teach*
-- **Post ad**: type (need teacher / I teach), name, phone, qualification, experience, class, subject, address, photo, 4-digit PIN
-- PIN dialog → edit or delete (with confirm); auto-delete after 1 month
+- **Post ad**: type (need teacher / I teach), name, phone, qualification, experience, class, subject, address, photo
+- Owner's manage dialog → edit or delete (with confirm); auto-delete after 1 month
 
 ### Skilled workers (mechanics / mistri)
 - Search + filter by ~20 trades (mason, carpenter, electrician, tiles, paint, car, AC, fridge, gas, thai glass, sanitary, quilt-maker, interior, CCTV, computer, TV, sewing…)
@@ -171,7 +171,7 @@ All community posts share a common pattern: **no login; owner sets a 4–6 digit
 
 1. **Directory card** — photo, name, meta, phone → Call / WhatsApp / Copy number
 2. **Filter bar** — search input + select/chips + "clear filters" + result count
-3. **Anonymous posting with PIN** — no accounts; PIN gates edit / delete / mark-done
+3. **Social sign-in for posting** — Google / Facebook / Apple; first sign-in creates the account; only the owner can edit / delete / mark done
 4. **Moderation** — admin approval queue, report button, honeypot anti-spam, IP block
 5. **Auto-expiry** — jobs (chosen days), to-let (30 d), tuition (1 month)
 6. **Featured / Verified** badges (admin-granted, paid-promotion ready)

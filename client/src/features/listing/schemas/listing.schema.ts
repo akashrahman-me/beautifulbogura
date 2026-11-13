@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { honeypot, phoneField, pinField, takaField } from '@/lib/validation';
+import { honeypot, phoneField, takaField } from '@/lib/validation';
 import type { ListParams } from '@/types/api';
 
 export const LISTING_CATEGORIES = [
@@ -24,6 +24,8 @@ export interface Listing {
   phone: string;
   whatsapp: boolean;
   address: string;
+  /** Set by the server from the signed-in poster; only they can manage the post. */
+  ownerId: string;
   createdAt: string;
   status: 'active' | 'sold' | 'deleted';
 }
@@ -43,7 +45,6 @@ export const createListingSchema = z.object({
   phone: phoneField,
   whatsapp: z.boolean(),
   address: z.string().trim().min(2, 'এলাকার নাম লিখুন'),
-  pin: pinField,
   website: honeypot,
 });
 export type CreateListingIn = z.input<typeof createListingSchema>;

@@ -67,6 +67,7 @@ function JobBody({ job }: { job: Job }) {
       <div className="rounded-lg border border-line bg-surface px-4 pt-1 pb-3">
         <PostActions
           id={job.id}
+          ownerId={job.ownerId}
           doneLabel="নিয়োগ সম্পন্ন হয়েছে"
           report={report}
           manage={{

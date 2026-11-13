@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { honeypot, phoneField, pinField } from '@/lib/validation';
+import { honeypot, phoneField } from '@/lib/validation';
 import type { ListParams } from '@/types/api';
 
 export interface Job {
@@ -15,6 +15,8 @@ export interface Job {
   address: string;
   image: string | null;
   deadline: string;
+  /** Set by the server from the signed-in poster; only they can manage the post. */
+  ownerId: string;
   createdAt: string;
   status: 'active' | 'done' | 'deleted';
 }
@@ -35,7 +37,6 @@ export const createJobSchema = z.object({
   whatsapp: z.boolean(),
   address: z.string().trim().min(2, 'ঠিকানা লিখুন'),
   duration: z.enum(DURATIONS),
-  pin: pinField,
   images: z.array(z.instanceof(File)).max(1).optional(),
   website: honeypot,
 });

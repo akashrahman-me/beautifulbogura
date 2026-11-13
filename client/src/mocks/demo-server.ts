@@ -6,7 +6,8 @@
 import * as db from './data';
 
 type Json = Record<string, unknown>;
-type Req = { method: string; params: Record<string, string>; query: URLSearchParams; body: Json };
+/** `userId` is the signed-in caller, read from the `Authorization: Bearer demo.<id>` header. */
+type Req = { method: string; params: Record<string, string>; query: URLSearchParams; body: Json; userId: string | null };
 type Handler = (req: Req) => Response | Promise<Response>;
 
 const LATENCY = 350;
@@ -40,48 +41,83 @@ const today = () => new Date().getDay();
 const donorStatus = (last: string | null) =>
   last == null ? 'unknown' : (Date.now() - new Date(last).getTime()) / DAY >= 120 ? 'ready' : 'not-yet';
 
-/* PINs for demo posts: every seeded post uses 1234; new posts keep the PIN they were created with. */
-const pins = new Map<string, string>();
-const pinOf = (id: string) => pins.get(id) ?? '1234';
+/* ---- demo sign-in ----
+ * Social sign-in is a provider redirect in real life; here any provider signs you in at once as one
+ * demo user. The session is kept in localStorage so a reload stays signed in (the real API uses an
+ * httpOnly refresh cookie). The first seeded post of every kind belongs to this user.
+ */
+const DEMO_USER_ID = 'usr_demo';
+const SESSION_KEY = 'bb-demo-session';
+const PROVIDER_NAMES: Record<string, string> = { google: 'Google', facebook: 'Facebook', apple: 'Apple' };
+type DemoUser = { id: string; name: string; email: string | null; avatar: string | null; provider: string };
 
-/** CRUD + PIN + report handlers for one community collection. */
-function community<T extends { id: string; createdAt: string; status: string }>(
-  base: string,
-  rows: T[],
-  prefix: string,
-  filter: (row: T, q: URLSearchParams) => boolean,
-  build: (body: Json) => Omit<T, 'id' | 'createdAt' | 'status'>,
-  doneStatus = 'done',
+const store = () => (typeof localStorage === 'undefined' ? null : localStorage);
+const readSession = (): DemoUser | null => {
+  try {
+    return JSON.parse(store()?.getItem(SESSION_KEY) ?? 'null') as DemoUser | null;
+  } catch {
+    return null;
+  }
+};
+const session = (user: DemoUser) => ({ accessToken: `demo.${user.id}`, user });
+
+const UNAUTHENTICATED = () => fail(401, 'UNAUTHENTICATED', 'পোস্ট করতে আগে সাইন ইন করুন');
+const NOT_OWNER = () => fail(403, 'NOT_OWNER', 'শুধু পোস্টদাতা নিজে এই পোস্ট পরিবর্তন করতে পারেন');
+
+type Owned = { id: string; createdAt: string; status: string; ownerId?: string };
+/** Every community collection, so `/me/posts` can gather a user's posts across all of them. */
+const collections: { kind: string; rows: Owned[]; title: (r: Owned) => string; href: (r: Owned) => string }[] = [];
+
+/** CRUD + ownership + report handlers for one community collection. */
+function community<T extends Owned>(opts: {
+  base: string;
+  rows: T[];
+  prefix: string;
+  /** `kind` as the client names it in `/me/posts`. */
+  kind: string;
+  title: (row: T) => string;
+  href: (row: T) => string;
+  filter: (row: T, q: URLSearchParams) => boolean;
+  build: (body: Json) => Omit<T, 'id' | 'createdAt' | 'status' | 'ownerId'>;
+  doneStatus?: string;
   /** Sold / rented posts stay listed (dimmed); filled jobs and found tutors drop off. */
-  keepDone = false,
-): [string, string, Handler][] {
+  keepDone?: boolean;
+}): [string, string, Handler][] {
+  const { base, rows, prefix, filter, build, doneStatus = 'done', keepDone = false } = opts;
+  // Seeded posts: the first belongs to the demo user so the owner controls can be tried.
+  rows.forEach((r, i) => (r.ownerId ??= i === 0 ? DEMO_USER_ID : `usr_seed_${i}`));
+  collections.push({ kind: opts.kind, rows, title: opts.title as (r: Owned) => string, href: opts.href as (r: Owned) => string });
+
   const visible = (r: T) => r.status === 'active' || (keepDone && r.status === doneStatus);
+  const owned = (id: string, userId: string | null) => {
+    const row = rows.find((r) => r.id === id && r.status !== 'deleted');
+    if (!row) return fail(404, 'NOT_FOUND', 'পোস্টটি পাওয়া যায়নি');
+    if (!userId) return UNAUTHENTICATED();
+    if (row.ownerId !== userId) return NOT_OWNER();
+    return row;
+  };
   return [
     ['GET', base, ({ query }) => paginate(rows.filter((r) => visible(r) && filter(r, query)).sort(byNewest), query)],
     ['GET', `${base}/:id`, ({ params }) => {
       const row = rows.find((r) => r.id === params.id && visible(r));
       return row ? ok(row) : fail(404, 'NOT_FOUND', 'পোস্টটি পাওয়া যায়নি');
     }],
-    ['POST', base, ({ body }) => {
-      const pin = String(body.pin ?? '');
-      if (!/^\d{4,6}$/.test(pin)) return fail(422, 'VALIDATION', 'পিন ৪ থেকে ৬ সংখ্যার হতে হবে', [{ path: 'pin', message: 'পিন ৪ থেকে ৬ সংখ্যার হতে হবে' }]);
-      const row = { ...build(body), id: db.nextId(prefix), createdAt: new Date().toISOString(), status: 'active' } as T;
+    ['POST', base, ({ body, userId }) => {
+      if (!userId) return UNAUTHENTICATED();
+      const row = { ...build(body), id: db.nextId(prefix), createdAt: new Date().toISOString(), status: 'active', ownerId: userId } as T;
       rows.unshift(row);
-      pins.set(row.id, pin);
       return created({ id: row.id, status: 'published' }, 'পোস্ট প্রকাশিত হয়েছে');
     }],
-    ['PATCH', `${base}/:id`, ({ params, body }) => {
-      const row = rows.find((r) => r.id === params.id);
-      if (!row) return fail(404, 'NOT_FOUND', 'পোস্টটি পাওয়া যায়নি');
-      if (String(body.pin) !== pinOf(row.id)) return fail(403, 'INVALID_PIN', 'পিন মেলেনি', [{ path: 'pin', message: 'পিন মেলেনি' }]);
-      const { pin: _pin, ...rest } = body;
+    ['PATCH', `${base}/:id`, ({ params, body, userId }) => {
+      const row = owned(params.id, userId);
+      if (row instanceof Response) return row;
+      const { ownerId: _o, id: _i, status: _s, ...rest } = body;
       Object.assign(row, rest);
       return ok(row, 'হালনাগাদ হয়েছে');
     }],
-    ['POST', `${base}/:id/manage`, ({ params, body }) => {
-      const row = rows.find((r) => r.id === params.id);
-      if (!row) return fail(404, 'NOT_FOUND', 'পোস্টটি পাওয়া যায়নি');
-      if (String(body.pin) !== pinOf(row.id)) return fail(403, 'INVALID_PIN', 'পিন মেলেনি। আবার চেষ্টা করুন।', [{ path: 'pin', message: 'পিন মেলেনি' }]);
+    ['POST', `${base}/:id/manage`, ({ params, body, userId }) => {
+      const row = owned(params.id, userId);
+      if (row instanceof Response) return row;
       row.status = body.action === 'delete' ? 'deleted' : doneStatus;
       return ok({ ok: true });
     }],
@@ -168,23 +204,23 @@ const routes: [string, string, Handler][] = [
   }],
 
   /* ---- community posts ---- */
-  ...community('/jobs', db.jobs, 'job',
-    (r, q) => matches(q.get('search'), r.company, r.title, r.address),
-    (b) => ({ company: String(b.company), title: String(b.title), vacancies: Number(b.vacancies), salary: String(b.salary ?? ''), education: String(b.education ?? ''), details: String(b.details ?? ''), phone: String(b.phone), whatsapp: Boolean(b.whatsapp), address: String(b.address ?? ''), image: ((b.images as string[]) ?? [])[0] ?? null, deadline: String(b.deadline) })),
-  ...community('/listings', db.listings, 'lst',
-    (r, q) => (!q.get('category') || r.category === q.get('category')) && matches(q.get('search'), r.title, r.address, r.description),
-    (b) => ({ category: String(b.category), title: String(b.title), condition: String(b.condition), price: Number(b.price), description: String(b.description ?? ''), images: (b.images as string[]) ?? [], sellerName: String(b.sellerName), phone: String(b.phone), whatsapp: Boolean(b.whatsapp), address: String(b.address ?? '') }),
-    'sold', true),
-  ...community('/rentals', db.rentals, 'rnt',
-    (r, q) => (!q.get('type') || r.type === q.get('type')) && matches(q.get('search'), r.title, r.address, r.description),
-    (b) => ({ type: String(b.type), title: String(b.title), rent: Number(b.rent), rooms: Number(b.rooms), gas: Boolean(b.gas), attachedBath: Boolean(b.attachedBath), description: String(b.description ?? ''), ownerName: String(b.ownerName), phone: String(b.phone), whatsapp: Boolean(b.whatsapp), address: String(b.address), mapUrl: String(b.mapUrl ?? ''), images: (b.images as string[]) ?? [], featured: false, verified: false }),
-    'rented', true),
-  ...community('/vehicles', db.vehicles, 'veh',
-    (r, q) => !q.get('type') || r.type === q.get('type'),
-    (b) => ({ type: String(b.type), ownerName: String(b.ownerName), description: String(b.description ?? ''), phone: String(b.phone), whatsapp: Boolean(b.whatsapp), featured: false, verified: false })),
-  ...community('/tuitions', db.tuitions, 'tui',
-    (r, q) => (!q.get('kind') || r.kind === q.get('kind')) && matches(q.get('search'), r.subject, r.classLevel, r.address, r.name),
-    (b) => ({ kind: String(b.kind), name: String(b.name), phone: String(b.phone), qualification: String(b.qualification ?? ''), experience: String(b.experience ?? ''), classLevel: String(b.classLevel), subject: String(b.subject), address: String(b.address ?? ''), note: String(b.note ?? ''), photo: ((b.images as string[]) ?? [])[0] ?? null })),
+  ...community({ base: '/jobs', rows: db.jobs, prefix: 'job', kind: 'job', title: (r) => r.title, href: (r) => `/jobs/${r.id}`,
+    filter: (r, q) => matches(q.get('search'), r.company, r.title, r.address),
+    build: (b) => ({ company: String(b.company), title: String(b.title), vacancies: Number(b.vacancies), salary: String(b.salary ?? ''), education: String(b.education ?? ''), details: String(b.details ?? ''), phone: String(b.phone), whatsapp: Boolean(b.whatsapp), address: String(b.address ?? ''), image: ((b.images as string[]) ?? [])[0] ?? null, deadline: String(b.deadline) }) }),
+  ...community({ base: '/listings', rows: db.listings, prefix: 'lst', kind: 'listing', title: (r) => r.title, href: () => '/buy-sell',
+    filter: (r, q) => (!q.get('category') || r.category === q.get('category')) && matches(q.get('search'), r.title, r.address, r.description),
+    build: (b) => ({ category: String(b.category), title: String(b.title), condition: String(b.condition), price: Number(b.price), description: String(b.description ?? ''), images: (b.images as string[]) ?? [], sellerName: String(b.sellerName), phone: String(b.phone), whatsapp: Boolean(b.whatsapp), address: String(b.address ?? '') }),
+    doneStatus: 'sold', keepDone: true }),
+  ...community({ base: '/rentals', rows: db.rentals, prefix: 'rnt', kind: 'rental', title: (r) => r.title, href: () => '/to-let',
+    filter: (r, q) => (!q.get('type') || r.type === q.get('type')) && matches(q.get('search'), r.title, r.address, r.description),
+    build: (b) => ({ type: String(b.type), title: String(b.title), rent: Number(b.rent), rooms: Number(b.rooms), gas: Boolean(b.gas), attachedBath: Boolean(b.attachedBath), description: String(b.description ?? ''), ownerName: String(b.ownerName), phone: String(b.phone), whatsapp: Boolean(b.whatsapp), address: String(b.address), mapUrl: String(b.mapUrl ?? ''), images: (b.images as string[]) ?? [], featured: false, verified: false }),
+    doneStatus: 'rented', keepDone: true }),
+  ...community({ base: '/vehicles', rows: db.vehicles, prefix: 'veh', kind: 'vehicle', title: (r) => r.ownerName, href: () => '/car-rent',
+    filter: (r, q) => !q.get('type') || r.type === q.get('type'),
+    build: (b) => ({ type: String(b.type), ownerName: String(b.ownerName), description: String(b.description ?? ''), phone: String(b.phone), whatsapp: Boolean(b.whatsapp), featured: false, verified: false }) }),
+  ...community({ base: '/tuitions', rows: db.tuitions, prefix: 'tui', kind: 'tuition', title: (r) => `${r.subject} — ${r.classLevel}`, href: () => '/tuition',
+    filter: (r, q) => (!q.get('kind') || r.kind === q.get('kind')) && matches(q.get('search'), r.subject, r.classLevel, r.address, r.name),
+    build: (b) => ({ kind: String(b.kind), name: String(b.name), phone: String(b.phone), qualification: String(b.qualification ?? ''), experience: String(b.experience ?? ''), classLevel: String(b.classLevel), subject: String(b.subject), address: String(b.address ?? ''), note: String(b.note ?? ''), photo: ((b.images as string[]) ?? [])[0] ?? null }) }),
 
   /* ---- skilled workers ---- */
   ['GET', '/workers', ({ query }) => {
@@ -235,8 +271,31 @@ const routes: [string, string, Handler][] = [
   /* ---- uploads: object URLs stand in for stored files ---- */
   ['POST', '/uploads', ({ body }) => created({ urls: (body.files as File[]).map((f) => URL.createObjectURL(f)) })],
 
-  /* ---- auth (no portal login yet) ---- */
-  ['POST', '/auth/refresh', () => fail(401, 'NO_SESSION', 'লগইন করা নেই')],
+  /* ---- auth: social sign-in (see the note at the top of the demo sign-in section) ---- */
+  ['POST', '/auth/demo/sign-in', ({ body }) => {
+    const provider = String(body.provider);
+    if (!PROVIDER_NAMES[provider]) return fail(422, 'VALIDATION', 'অজানা সাইন ইন পদ্ধতি');
+    const user: DemoUser = { id: DEMO_USER_ID, name: 'ডেমো ব্যবহারকারী', email: 'demo@example.com', avatar: null, provider };
+    store()?.setItem(SESSION_KEY, JSON.stringify(user));
+    return ok(session(user), `${PROVIDER_NAMES[provider]} দিয়ে সাইন ইন হয়েছে`);
+  }],
+  ['POST', '/auth/refresh', () => {
+    const user = readSession();
+    return user ? ok(session(user)) : fail(401, 'NO_SESSION', 'সাইন ইন করা নেই');
+  }],
+  ['POST', '/auth/logout', () => {
+    store()?.removeItem(SESSION_KEY);
+    return ok({ ok: true }, 'সাইন আউট হয়েছে');
+  }],
+  ['GET', '/me/posts', ({ userId }) => {
+    if (!userId) return UNAUTHENTICATED();
+    const mine = collections.flatMap((c) =>
+      c.rows
+        .filter((r) => r.ownerId === userId && r.status !== 'deleted')
+        .map((r) => ({ kind: c.kind, id: r.id, title: c.title(r), status: r.status, createdAt: r.createdAt, href: c.href(r) })),
+    );
+    return ok(mine.sort(byNewest));
+  }],
 ];
 
 /** Compile "/a/:id/b" patterns once. */
@@ -262,7 +321,9 @@ export async function demoFetch(input: RequestInfo | URL, init?: RequestInit): P
     let body: Json = {};
     if (typeof init?.body === 'string') body = JSON.parse(init.body) as Json;
     else if (init?.body instanceof FormData) body = { files: init.body.getAll('files') };
-    return r.handler({ method, params, query: url.searchParams, body });
+    const auth = new Headers(init?.headers).get('Authorization') ?? '';
+    const userId = auth.startsWith('Bearer demo.') && readSession() ? auth.slice('Bearer demo.'.length) : null;
+    return r.handler({ method, params, query: url.searchParams, body, userId });
   }
   return fail(404, 'ROUTE_NOT_FOUND', `ডেমো সার্ভারে ${method} ${path} নেই`);
 }

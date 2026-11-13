@@ -1,19 +1,24 @@
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Misc';
 
-/** Shown after an anonymous post is published: where to see it and a PIN reminder. */
+/** Shown after a community post is published: where to see it, and where to manage it later. */
 export function PostedSuccess({ title, href, listLabel, days }: { title: string; href: string; listLabel: string; days?: string }) {
   return (
     <Alert
       tone="success"
       title={title}
       action={
-        <Button href={href} size="sm" variant="secondary" iconRight="arrow-right">
-          {listLabel}
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button href={href} size="sm" variant="secondary" iconRight="arrow-right">
+            {listLabel}
+          </Button>
+          <Button href="/account" size="sm" variant="ghost" iconLeft="user">
+            আমার পোস্ট
+          </Button>
+        </div>
       }
     >
-      <p>{days ? `পোস্টটি ${days} দেখা যাবে, তারপর নিজে থেকেই সরে যাবে। ` : ''}আপনার পিনটি মনে রাখুন — পোস্ট মুছে ফেলতে বা ‘সম্পন্ন’ করতে লাগবে।</p>
+      <p>{days ? `পোস্টটি ${days} দেখা যাবে, তারপর নিজে থেকেই সরে যাবে। ` : ''}মুছে ফেলতে বা ‘সম্পন্ন’ করতে যেকোনো সময় ‘আমার অ্যাকাউন্ট’-এ যান — একই অ্যাকাউন্ট দিয়ে সাইন ইন করলেই হবে।</p>
     </Alert>
   );
 }

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { honeypot, phoneField, pinField } from '@/lib/validation';
+import { honeypot, phoneField } from '@/lib/validation';
 import type { ListParams } from '@/types/api';
 
 export const VEHICLE_TYPES = [['private-car', 'প্রাইভেট কার'], ['bus', 'বাস'], ['hiace', 'হায়েস'], ['truck', 'ট্রাক'], ['other', 'অন্যান্য']] as const;
@@ -15,6 +15,8 @@ export interface Vehicle {
   whatsapp: boolean;
   featured: boolean;
   verified: boolean;
+  /** Set by the server from the signed-in poster; only they can manage the post. */
+  ownerId: string;
   createdAt: string;
   status: 'active' | 'done' | 'deleted';
 }
@@ -29,7 +31,6 @@ export const createVehicleSchema = z.object({
   description: z.string().trim().min(5, 'গাড়ি, আসন সংখ্যা আর কোথায় যান লিখুন'),
   phone: phoneField,
   whatsapp: z.boolean(),
-  pin: pinField,
   website: honeypot,
 });
 export type CreateVehicleIn = z.input<typeof createVehicleSchema>;

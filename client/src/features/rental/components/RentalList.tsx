@@ -55,7 +55,7 @@ function RentalItem({ item, now, fav, onFav }: { item: Rental; now: Date | null;
               গুগল ম্যাপে দেখুন
             </a>
           )}
-          <PostActions id={item.id} manage={manage} report={report} doneLabel="ভাড়া হয়ে গেছে" />
+          <PostActions id={item.id} ownerId={item.ownerId} manage={manage} report={report} doneLabel="ভাড়া হয়ে গেছে" />
         </>
       }
     />
@@ -84,7 +84,7 @@ export function RentalList() {
         action={<Button href="/to-let/new" iconLeft="plus">বাসার বিজ্ঞাপন দিন</Button>}
       />
       <NoticeBanner>
-        <p>বিজ্ঞাপন ৩০ দিন দেখা যায়। ভাড়া হয়ে গেলে পিন দিয়ে ‘ভাড়া হয়ে গেছে’ চিহ্নিত করুন। বাসা দেখার আগে অগ্রিম টাকা দেবেন না।</p>
+        <p>বিজ্ঞাপন ৩০ দিন দেখা যায়। ভাড়া হয়ে গেলে ‘আমার অ্যাকাউন্ট’ থেকে ‘ভাড়া হয়ে গেছে’ চিহ্নিত করুন। বাসা দেখার আগে অগ্রিম টাকা দেবেন না।</p>
       </NoticeBanner>
       <FilterBar
         query={q}

@@ -8,15 +8,14 @@ import { useNow } from '@/hooks/useNow';
 import { flatPages, totalOf } from '@/lib/community';
 import { applyApiErrors } from '@/lib/form';
 import { bn, cn, timeAgo } from '@/lib/utils';
-import { PIN_HINT } from '@/lib/validation';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { TextArea, TextField } from '@/components/ui/Field';
 import { FileDrop } from '@/components/ui/FileDrop';
 import { ChoiceGroup } from '@/components/ui/Interactive';
 import { Alert, Avatar, MetaList } from '@/components/ui/Misc';
-import { PinInput } from '@/components/ui/PinInput';
 import { Tabs } from '@/components/ui/Tabs';
+import { RequireSignIn } from '@/features/auth';
 import { ContactActions, LoadMore, NoticeBanner, PageHeader, PhoneLink } from '@/components/shared/Blocks';
 import { PostActions } from '@/components/shared/PostActions';
 import { PostedSuccess } from '@/components/shared/PostedSuccess';
@@ -62,7 +61,7 @@ function TuitionCard({ t, now }: { t: Tuition; now: Date | null }) {
         <PhoneLink phone={t.phone} />
         <ContactActions phone={t.phone} compact />
       </div>
-      <PostActions id={t.id} manage={manage} report={report} doneLabel={teach ? 'টিউশন পেয়ে গেছি' : 'শিক্ষক পেয়ে গেছি'} />
+      <PostActions id={t.id} ownerId={t.ownerId} manage={manage} report={report} doneLabel={teach ? 'টিউশন পেয়ে গেছি' : 'শিক্ষক পেয়ে গেছি'} />
     </article>
   );
 }
@@ -76,7 +75,7 @@ export function TuitionList() {
     <div className="container-page flex flex-col gap-5">
       <PageHeader eyebrow="শিক্ষা" title="টিউশন" description="শিক্ষক খুঁজছেন, নাকি পড়াতে চান — বিজ্ঞাপন দিন, সরাসরি কথা বলুন।" action={<Button href="/tuition/new" iconLeft="plus">বিজ্ঞাপন দিন</Button>} />
       <NoticeBanner>
-        <p>বিজ্ঞাপন এক মাস পর নিজে থেকেই মুছে যায়। শিক্ষক বা টিউশন পেয়ে গেলে পিন দিয়ে আগেই সরিয়ে দিন। শিশুর নিরাপত্তায় প্রথম দেখা অভিভাবকের উপস্থিতিতে করুন।</p>
+        <p>বিজ্ঞাপন এক মাস পর নিজে থেকেই মুছে যায়। শিক্ষক বা টিউশন পেয়ে গেলে ‘আমার অ্যাকাউন্ট’ থেকে আগেই সরিয়ে দিন। শিশুর নিরাপত্তায় প্রথম দেখা অভিভাবকের উপস্থিতিতে করুন।</p>
       </NoticeBanner>
       <Tabs label="টিউশনের ধরন" variant="pill" value={tab} onChange={(v) => void setTab(v === 'all' ? null : v)} items={[{ value: 'all', label: 'সব' }, ...TUITION_KINDS.map(([value, label]) => ({ value, label }))]} />
       {!list.isPending && !list.isError && <p className="bb-filterbar-count">{bn(totalOf(list.data))}টি বিজ্ঞাপন</p>}
@@ -105,7 +104,7 @@ export function TuitionForm() {
   const [done, setDone] = useState(false);
   const form = useForm<CreateTuitionIn, unknown, CreateTuitionInput>({
     resolver: zodResolver(createTuitionSchema),
-    defaultValues: { name: '', phone: '', classLevel: '', subject: '', qualification: '', experience: '', address: '', note: '', images: [], pin: '', website: '' },
+    defaultValues: { name: '', phone: '', classLevel: '', subject: '', qualification: '', experience: '', address: '', note: '', images: [], website: '' },
   });
   const { errors } = form.formState;
   const kind = useWatch({ control: form.control, name: 'kind' });
@@ -116,30 +115,31 @@ export function TuitionForm() {
       {done ? (
         <PostedSuccess title="বিজ্ঞাপন প্রকাশিত হয়েছে" href="/tuition" listLabel="টিউশন দেখুন" days="এক মাস" />
       ) : (
-        <form onSubmit={submit} noValidate className="flex flex-col gap-5 rounded-lg border border-line bg-surface p-5">
-          <Controller control={form.control} name="kind" render={({ field }) => <ChoiceGroup required label="আপনি কী চান?" options={TUITION_KINDS.map(([value, label]) => ({ value, label }))} value={field.value ?? ''} onChange={field.onChange} error={errors.kind?.message} />} />
-          <TextField label={kind === 'want-to-teach' ? 'আপনার নাম' : 'অভিভাবকের নাম'} required {...form.register('name')} error={errors.name?.message} />
-          <TextField label="মোবাইল নম্বর" required inputMode="tel" icon="phone" {...form.register('phone')} error={errors.phone?.message} />
-          <div className="grid gap-5 sm:grid-cols-2">
-            <TextField label="শ্রেণি" required placeholder="যেমন: অষ্টম" {...form.register('classLevel')} error={errors.classLevel?.message} />
-            <TextField label="বিষয়" required placeholder="যেমন: গণিত ও ইংরেজি" {...form.register('subject')} error={errors.subject?.message} />
-          </div>
-          {kind === 'want-to-teach' && (
-            <>
-              <TextField label="শিক্ষাগত যোগ্যতা" required placeholder="যেমন: বিএসসি, আজিজুল হক কলেজ" {...form.register('qualification')} error={errors.qualification?.message} />
-              <TextField label="অভিজ্ঞতা" optional placeholder="যেমন: ৩ বছর" {...form.register('experience')} />
-              <Controller control={form.control} name="images" render={({ field }) => <FileDrop label="আপনার ছবি" optional max={1} value={field.value} onChange={field.onChange} />} />
-            </>
-          )}
-          <TextField label="এলাকা" required icon="pin" {...form.register('address')} error={errors.address?.message} />
-          <TextArea label="অন্য কিছু" optional rows={3} placeholder="সপ্তাহে কয়দিন, সময়, সম্মানী" {...form.register('note')} />
-          <Controller control={form.control} name="pin" render={({ field }) => <PinInput required label="একটি পিন ঠিক করুন" value={field.value} onChange={field.onChange} hint={PIN_HINT} error={errors.pin?.message} />} />
-          <input type="text" tabIndex={-1} autoComplete="off" aria-hidden className="bb-sr" {...form.register('website')} />
-          {errors.root && <Alert tone="danger" title={errors.root.message} />}
-          <Button type="submit" size="lg" block loading={create.isPending} iconLeft="check">
-            বিজ্ঞাপন প্রকাশ করুন
-          </Button>
-        </form>
+        <RequireSignIn>
+          <form onSubmit={submit} noValidate className="flex flex-col gap-5 rounded-lg border border-line bg-surface p-5">
+            <Controller control={form.control} name="kind" render={({ field }) => <ChoiceGroup required label="আপনি কী চান?" options={TUITION_KINDS.map(([value, label]) => ({ value, label }))} value={field.value ?? ''} onChange={field.onChange} error={errors.kind?.message} />} />
+            <TextField label={kind === 'want-to-teach' ? 'আপনার নাম' : 'অভিভাবকের নাম'} required {...form.register('name')} error={errors.name?.message} />
+            <TextField label="মোবাইল নম্বর" required inputMode="tel" icon="phone" {...form.register('phone')} error={errors.phone?.message} />
+            <div className="grid gap-5 sm:grid-cols-2">
+              <TextField label="শ্রেণি" required placeholder="যেমন: অষ্টম" {...form.register('classLevel')} error={errors.classLevel?.message} />
+              <TextField label="বিষয়" required placeholder="যেমন: গণিত ও ইংরেজি" {...form.register('subject')} error={errors.subject?.message} />
+            </div>
+            {kind === 'want-to-teach' && (
+              <>
+                <TextField label="শিক্ষাগত যোগ্যতা" required placeholder="যেমন: বিএসসি, আজিজুল হক কলেজ" {...form.register('qualification')} error={errors.qualification?.message} />
+                <TextField label="অভিজ্ঞতা" optional placeholder="যেমন: ৩ বছর" {...form.register('experience')} />
+                <Controller control={form.control} name="images" render={({ field }) => <FileDrop label="আপনার ছবি" optional max={1} value={field.value} onChange={field.onChange} />} />
+              </>
+            )}
+            <TextField label="এলাকা" required icon="pin" {...form.register('address')} error={errors.address?.message} />
+            <TextArea label="অন্য কিছু" optional rows={3} placeholder="সপ্তাহে কয়দিন, সময়, সম্মানী" {...form.register('note')} />
+            <input type="text" tabIndex={-1} autoComplete="off" aria-hidden className="bb-sr" {...form.register('website')} />
+            {errors.root && <Alert tone="danger" title={errors.root.message} />}
+            <Button type="submit" size="lg" block loading={create.isPending} iconLeft="check">
+              বিজ্ঞাপন প্রকাশ করুন
+            </Button>
+          </form>
+        </RequireSignIn>
       )}
     </div>
   );
