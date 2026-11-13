@@ -73,10 +73,8 @@ export function TuitionList() {
   const items = flatPages(list.data);
   return (
     <div className="container-page flex flex-col gap-5">
-      <PageHeader eyebrow="শিক্ষা" title="টিউশন" description="শিক্ষক খুঁজছেন, নাকি পড়াতে চান — বিজ্ঞাপন দিন, সরাসরি কথা বলুন।" action={<Button href="/tuition/new" iconLeft="plus">বিজ্ঞাপন দিন</Button>} />
-      <NoticeBanner>
-        <p>বিজ্ঞাপন এক মাস পর নিজে থেকেই মুছে যায়। শিক্ষক বা টিউশন পেয়ে গেলে ‘আমার অ্যাকাউন্ট’ থেকে আগেই সরিয়ে দিন। শিশুর নিরাপত্তায় প্রথম দেখা অভিভাবকের উপস্থিতিতে করুন।</p>
-      </NoticeBanner>
+      <PageHeader eyebrow="শিক্ষা" title="টিউশন" action={<Button href="/tuition/new" iconLeft="plus">বিজ্ঞাপন দিন</Button>} />
+      <NoticeBanner items={['শিশুর নিরাপত্তায় প্রথম দেখা অভিভাবকের উপস্থিতিতে করুন।']} />
       <Tabs label="টিউশনের ধরন" variant="pill" value={tab} onChange={(v) => void setTab(v === 'all' ? null : v)} items={[{ value: 'all', label: 'সব' }, ...TUITION_KINDS.map(([value, label]) => ({ value, label }))]} />
       {!list.isPending && !list.isError && <p className="bb-filterbar-count">{bn(totalOf(list.data))}টি বিজ্ঞাপন</p>}
       {list.isPending ? (
@@ -111,7 +109,7 @@ export function TuitionForm() {
   const submit = form.handleSubmit((v) => create.mutate(v, { onSuccess: () => setDone(true), onError: (e) => applyApiErrors(form, e) }));
   return (
     <div className="container-narrow flex flex-col gap-5">
-      <PageHeader eyebrow="টিউশন" title="টিউশনের বিজ্ঞাপন দিন" back={{ href: '/tuition', label: 'টিউশন' }} description="এক মাস দেখা যাবে, তারপর নিজে থেকেই মুছে যাবে।" />
+      <PageHeader eyebrow="টিউশন" title="টিউশনের বিজ্ঞাপন দিন" back={{ href: '/tuition', label: 'টিউশন' }} meta={<Badge tone="neutral" icon="clock">এক মাস দেখা যাবে</Badge>} />
       {done ? (
         <PostedSuccess title="বিজ্ঞাপন প্রকাশিত হয়েছে" href="/tuition" listLabel="টিউশন দেখুন" days="এক মাস" />
       ) : (

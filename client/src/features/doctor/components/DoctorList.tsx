@@ -35,7 +35,6 @@ export function DoctorList() {
       <PageHeader
         eyebrow="স্বাস্থ্য"
         title="ডাক্তারদের তালিকা"
-        description="নাম, বিশেষজ্ঞতা, হাসপাতাল বা নম্বর দিয়ে খুঁজুন। সিরিয়ালের জন্য সরাসরি কল করুন।"
         action={
           <Button href="/doctors/new" variant="secondary" iconLeft="plus">
             ডাক্তার যুক্ত করুন

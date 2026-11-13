@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { applyApiErrors } from '@/lib/form';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/Field';
 import { ChoiceGroup } from '@/components/ui/Interactive';
@@ -24,7 +25,7 @@ export function RegisterDonorForm() {
 
   return (
     <div className="container-narrow flex flex-col gap-5">
-      <PageHeader eyebrow="রক্ত ব্যাংক" title="রক্তদাতা হোন" back={{ href: '/blood-bank', label: 'রক্ত ব্যাংক' }} description="আপনার একটি কল কারো জীবন বাঁচাতে পারে। নম্বরটি শুধু রক্তের প্রয়োজনে দেখানো হবে।" />
+      <PageHeader eyebrow="রক্ত ব্যাংক" title="রক্তদাতা হোন" back={{ href: '/blood-bank', label: 'রক্ত ব্যাংক' }} meta={<Badge tone="neutral" icon="lock">নম্বরটি শুধু রক্তের প্রয়োজনে দেখানো হবে</Badge>} />
       {done ? (
         <Alert tone="success" title="নিবন্ধন সম্পন্ন হয়েছে। ধন্যবাদ!" action={<Button href="/blood-bank" size="sm" variant="secondary">দাতার তালিকা দেখুন</Button>}>
           রক্ত দেওয়ার পর তালিকা থেকে ‘তারিখ হালনাগাদ’ করতে ভুলবেন না।

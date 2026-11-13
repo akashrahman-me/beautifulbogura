@@ -25,12 +25,9 @@ export function RequireSignIn({ children, title = 'পোস্ট দিতে 
           <span className="grid size-11 shrink-0 place-items-center rounded-full bg-brand-soft text-brand">
             <Icon name="user" size={22} />
           </span>
-          <div className="flex flex-col gap-1">
-            <h2 id="signin-gate-title" className="text-h3">
-              {title}
-            </h2>
-            <p className="text-body text-ink-muted">কোনো পাসওয়ার্ড বা পিন মনে রাখতে হবে না। সাইন ইন করলে আপনার সব পোস্ট এক জায়গা থেকে সম্পাদনা, মুছে ফেলা বা ‘সম্পন্ন’ করতে পারবেন।</p>
-          </div>
+          <h2 id="signin-gate-title" className="text-h3 self-center">
+            {title}
+          </h2>
         </div>
         <SignInOptions />
       </section>

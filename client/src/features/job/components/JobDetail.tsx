@@ -60,7 +60,7 @@ function JobBody({ job }: { job: Job }) {
       </section>
       <MetaList items={[{ icon: 'pin', text: job.address }, { icon: 'calendar', text: `প্রকাশ: ${formatDate(job.createdAt)}` }]} />
       {expired ? (
-        <EmptyState icon="clock" title="আবেদনের সময় শেষ">এই পদে আর আবেদন নেওয়া হচ্ছে না।</EmptyState>
+        <EmptyState icon="clock" title="আবেদনের সময় শেষ" />
       ) : (
         <ContactActions phone={job.phone} whatsapp={job.whatsapp} copy />
       )}

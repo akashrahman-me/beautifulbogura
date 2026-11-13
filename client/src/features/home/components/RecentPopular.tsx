@@ -11,10 +11,11 @@ import { ServiceTiles } from './ServiceGrid';
 
 const toServices = (slugs: string[]) => slugs.map(serviceBySlug).filter(Boolean).slice(0, 8) as Service[];
 
-/** “Recently viewed” (this device) and “Popular · all time” (from the API). */
+/** “Recently viewed” (this device) and “Popular · all time” (from the API). The recent tab appears once there is something in it. */
 export function RecentPopular() {
   const recent = useLocalStore((s) => s.recent);
-  const [tab, setTab] = useState<'recent' | 'popular'>('popular');
+  const [picked, setTab] = useState<'recent' | 'popular'>('popular');
+  const tab = recent.length ? picked : 'popular';
   const popular = usePopularServices();
 
   return (
@@ -25,15 +26,11 @@ export function RecentPopular() {
         onChange={setTab}
         items={[
           { value: 'popular', label: 'জনপ্রিয় · সব সময়', icon: 'star' },
-          { value: 'recent', label: 'সাম্প্রতিক দেখা', icon: 'clock' },
+          ...(recent.length ? [{ value: 'recent' as const, label: 'সাম্প্রতিক দেখা', icon: 'clock' as const }] : []),
         ]}
       />
       {tab === 'recent' ? (
-        recent.length ? (
-          <ServiceTiles services={toServices(recent)} />
-        ) : (
-          <p className="text-body-sm text-ink-muted">আপনি যে সেবাগুলো দেখবেন, সেগুলো এখানে থাকবে — এই ডিভাইসেই, আর কোথাও নয়।</p>
-        )
+        <ServiceTiles services={toServices(recent)} />
       ) : popular.isPending ? (
         <Skeleton uniqueKey="popular-tiles" viewBox="0 0 360 90" height={90}>
           {[0, 1, 2, 3].map((i) => (

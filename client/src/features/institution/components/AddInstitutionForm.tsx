@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { applyApiErrors } from '@/lib/form';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { TextArea, TextField } from '@/components/ui/Field';
 import { ChoiceGroup } from '@/components/ui/Interactive';
@@ -23,7 +24,7 @@ export function AddInstitutionForm() {
   const submit = form.handleSubmit((v) => add.mutate(v, { onSuccess: () => setDone(true), onError: (e) => applyApiErrors(form, e) }));
   return (
     <div className="container-narrow flex flex-col gap-5">
-      <PageHeader eyebrow="শিক্ষা" title="প্রতিষ্ঠান যুক্ত করুন" back={{ href: '/education', label: 'শিক্ষা প্রতিষ্ঠান' }} description="অ্যাডমিন যাচাইয়ের পর প্রকাশিত হবে।" />
+      <PageHeader eyebrow="শিক্ষা" title="প্রতিষ্ঠান যুক্ত করুন" back={{ href: '/education', label: 'শিক্ষা প্রতিষ্ঠান' }} meta={<Badge tone="info" icon="verified">অ্যাডমিন যাচাইয়ের পর প্রকাশিত হবে</Badge>} />
       {done ? (
         <Alert tone="success" title="ধন্যবাদ! তথ্য জমা হয়েছে" action={<Button href="/education" size="sm" variant="secondary">তালিকায় ফিরে যান</Button>} />
       ) : (

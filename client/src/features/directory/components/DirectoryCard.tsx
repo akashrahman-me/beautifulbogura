@@ -59,7 +59,7 @@ export function DirectoryCard({ entry, config }: { entry: DirectoryEntry; config
       )}
 
       {config.ratable && (
-        <Dialog open={rateOpen} onOpenChange={setRateOpen} icon="star" title={`${entry.name} — রেটিং দিন`} description="কাজের মান কেমন ছিল? ১ থেকে ৫ তারকা দিন।">
+        <Dialog open={rateOpen} onOpenChange={setRateOpen} icon="star" title={`${entry.name} — রেটিং দিন`}>
           <div className="flex justify-center py-2">
             <Rating interactive size={32} value={0} onRate={(stars) => rate.mutate({ id: entry.id, stars }, { onSuccess: () => setRateOpen(false) })} />
           </div>

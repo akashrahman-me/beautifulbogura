@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: 'সব সেবা' };
 export default function ServicesPage() {
   return (
     <div className="container-page flex flex-col gap-4">
-      <PageHeader title="সব সেবা" description="বিভাগ বেছে নিন, অথবা সরাসরি সেবায় যান।" />
+      <PageHeader title="সব সেবা" />
       <Suspense>
         <ServiceGrid />
       </Suspense>

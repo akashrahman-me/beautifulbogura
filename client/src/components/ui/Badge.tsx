@@ -14,7 +14,10 @@ export function Badge({
   size,
   children,
   className,
+  title,
 }: {
+  /** Tooltip explaining what the badge means (e.g. what “যাচাইকৃত” checked). */
+  title?: string;
   tone?: BadgeTone;
   icon?: IconName | null;
   dot?: boolean;
@@ -24,7 +27,7 @@ export function Badge({
 }) {
   const ic = icon === undefined ? DEFAULT_ICON[tone] : icon;
   return (
-    <span className={cn('bb-badge', `bb-badge-${tone}`, size === 'lg' && 'bb-badge-lg', className)}>
+    <span className={cn('bb-badge', `bb-badge-${tone}`, size === 'lg' && 'bb-badge-lg', className)} title={title}>
       {ic ? <Icon name={ic} size={14} strokeWidth={2} /> : dot ? <span className="bb-badge-dot" aria-hidden /> : null}
       {children}
     </span>

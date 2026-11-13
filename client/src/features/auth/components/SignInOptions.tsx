@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Icon } from '@/components/ui/Icon';
 import { Alert } from '@/components/ui/Misc';
 import { useSignIn } from '../hooks/useAuth';
 import { PROVIDERS, type AuthProvider } from '../schemas/auth.schema';
@@ -40,9 +41,16 @@ export function SignInOptions({ returnTo, onSignedIn }: { returnTo?: string; onS
         </button>
       ))}
       {signIn.isError && <Alert tone="danger" title={signIn.error.message} />}
-      <p className="text-caption text-ink-muted">
-        আলাদা অ্যাকাউন্ট খুলতে হয় না — প্রথমবার সাইন ইন করলেই আপনার অ্যাকাউন্ট তৈরি হয়ে যাবে। আমরা শুধু আপনার নাম, ইমেইল ও প্রোফাইল ছবি নিই; আপনার অনুমতি ছাড়া কোথাও কিছু পোস্ট করি না।
-      </p>
+      <ul className="text-caption flex flex-col gap-1.5 text-ink-muted">
+        <li className="flex gap-2">
+          <Icon name="user" size={16} className="mt-0.5 shrink-0" />
+          প্রথমবার সাইন ইন করলেই আপনার অ্যাকাউন্ট তৈরি হয়ে যাবে।
+        </li>
+        <li className="flex gap-2">
+          <Icon name="lock" size={16} className="mt-0.5 shrink-0" />
+          আমরা শুধু আপনার নাম, ইমেইল ও প্রোফাইল ছবি নিই; আপনার অনুমতি ছাড়া কোথাও কিছু পোস্ট করি না।
+        </li>
+      </ul>
     </div>
   );
 }

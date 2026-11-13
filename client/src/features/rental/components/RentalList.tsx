@@ -80,12 +80,9 @@ export function RentalList() {
       <PageHeader
         eyebrow="ভাড়া"
         title="বাসা ভাড়া (টু-লেট)"
-        description="ফ্ল্যাট, সাবলেট, মেস, হোস্টেল, অফিস ও দোকান। মালিককে সরাসরি কল করুন।"
         action={<Button href="/to-let/new" iconLeft="plus">বাসার বিজ্ঞাপন দিন</Button>}
       />
-      <NoticeBanner>
-        <p>বিজ্ঞাপন ৩০ দিন দেখা যায়। ভাড়া হয়ে গেলে ‘আমার অ্যাকাউন্ট’ থেকে ‘ভাড়া হয়ে গেছে’ চিহ্নিত করুন। বাসা দেখার আগে অগ্রিম টাকা দেবেন না।</p>
-      </NoticeBanner>
+      <NoticeBanner items={['বাসা দেখার আগে অগ্রিম টাকা দেবেন না।']} />
       <FilterBar
         query={q}
         onQuery={(v) => void setParams({ q: v || null })}

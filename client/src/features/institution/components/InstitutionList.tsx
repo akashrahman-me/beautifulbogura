@@ -80,7 +80,7 @@ function NoticeFeed() {
   const { data, isPending, isError, error, refetch } = useNotices();
   return (
     <section className="flex flex-col gap-4">
-      <SectionHeader eyebrow="শিক্ষা" title="সাম্প্রতিক নোটিশ" description="নিবন্ধিত প্রতিষ্ঠানগুলোর সর্বশেষ নোটিশ" />
+      <SectionHeader eyebrow="শিক্ষা" title="সাম্প্রতিক নোটিশ" />
       {isPending ? (
         <Skeleton uniqueKey="notices" viewBox="0 0 360 150" height={150}>
           {[0, 1, 2].map((r) => (
@@ -133,7 +133,7 @@ export function InstitutionList() {
   return (
     <div className="container-page flex flex-col gap-8">
       <div className="flex flex-col gap-5">
-        <PageHeader eyebrow="শিক্ষা" title="শিক্ষা প্রতিষ্ঠান" description="স্কুল, কলেজ, মাদ্রাসা ও কারিগরি প্রতিষ্ঠান। নাম, ইআইআইএন বা এলাকা দিয়ে খুঁজুন।" action={<Button href="/education/new" variant="secondary" iconLeft="plus">প্রতিষ্ঠান যুক্ত করুন</Button>} />
+        <PageHeader eyebrow="শিক্ষা" title="শিক্ষা প্রতিষ্ঠান" action={<Button href="/education/new" variant="secondary" iconLeft="plus">প্রতিষ্ঠান যুক্ত করুন</Button>} />
         <FilterBar
           query={q}
           onQuery={(v) => void setParams({ q: v || null })}

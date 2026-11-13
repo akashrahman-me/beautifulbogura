@@ -64,8 +64,8 @@ export function ListingCard({
         )}
         <div className="bb-listing-badges">
           {closedLabel && <Badge tone="neutral" icon="check">{closedLabel}</Badge>}
-          {featured && <Badge tone="featured">ফিচার্ড</Badge>}
-          {verified && <Badge tone="verified">যাচাইকৃত</Badge>}
+          {featured && <Badge tone="featured" title="অ্যাডমিন উপরে রেখেছেন">ফিচার্ড</Badge>}
+          {verified && <Badge tone="verified" title="মালিকের কাগজপত্র অ্যাডমিন দেখেছেন">যাচাইকৃত</Badge>}
           {condition && <Badge tone="neutral">{condition}</Badge>}
         </div>
         {onFavourite && (

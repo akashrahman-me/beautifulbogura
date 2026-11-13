@@ -40,9 +40,9 @@ export interface DirectoryType {
 }
 
 export const DIRECTORY_TYPES: Record<string, DirectoryType> = {
-  police: { title: 'থানা পুলিশ', description: 'থানার কর্মকর্তাদের সরাসরি নম্বর। জরুরি অবস্থায় আগে ৯৯৯ এ কল করুন।', icon: 'police', tone: 'emergency', emergency: true, countLabel: 'টি নম্বর' },
-  'fire-service': { title: 'ফায়ার সার্ভিস', description: 'আগুন লাগলে আগে ৯৯৯ নম্বরে কল করুন, তারপর স্টেশনে।', icon: 'flame', tone: 'emergency', emergency: true, countLabel: 'টি নম্বর' },
-  ambulance: { title: 'অ্যাম্বুলেন্স ও লাশবাহী গাড়ি', description: 'নম্বরে চাপ দিলেই কল হবে।', icon: 'ambulance', tone: 'emergency', emergency: true, addable: true, countLabel: 'টি সেবা' },
+  police: { title: 'থানা পুলিশ', description: 'থানার কর্মকর্তাদের সরাসরি নম্বর।', icon: 'police', tone: 'emergency', emergency: true, countLabel: 'টি নম্বর' },
+  'fire-service': { title: 'ফায়ার সার্ভিস', description: 'ফায়ার স্টেশনের নম্বর।', icon: 'flame', tone: 'emergency', emergency: true, countLabel: 'টি নম্বর' },
+  ambulance: { title: 'অ্যাম্বুলেন্স ও লাশবাহী গাড়ি', description: 'সরকারি ও বেসরকারি অ্যাম্বুলেন্স, লাশবাহী গাড়ি।', icon: 'ambulance', tone: 'emergency', emergency: true, addable: true, countLabel: 'টি সেবা' },
   electricity: { title: 'বিদ্যুৎ অফিস', description: 'পল্লী বিদ্যুৎ ও পিডিবির অভিযোগ কেন্দ্র।', icon: 'bolt', tone: 'brand', emergency: true },
   hospital: { title: 'হাসপাতাল ও ক্লিনিক', description: 'সরকারি ও বেসরকারি হাসপাতাল, ক্লিনিক ও ডেন্টাল সেন্টার।', icon: 'hospital', tone: 'brand', addable: true },
   office: { title: 'গুরুত্বপূর্ণ অফিস', description: 'সরকারি ও বেসরকারি অফিসের ঠিকানা, সময় ও ম্যাপ।', icon: 'office', tone: 'info', addable: true },
@@ -65,7 +65,7 @@ export const DIRECTORY_TYPES: Record<string, DirectoryType> = {
   'tourist-spot': { title: 'দর্শনীয় স্থান', description: 'মহাস্থানগড়, পার্ক আর নদীর পাড় — ঘুরে আসুন।', icon: 'tree', tone: 'gold' },
   cook: { title: 'বাবুর্চি ও কসাই', description: 'বিয়ে ও অনুষ্ঠানের রান্না, কসাই।', icon: 'pot', tone: 'accent', addable: true, countLabel: 'জন' },
   'band-party': { title: 'ব্যান্ড পার্টি ও সাউন্ড সিস্টেম', description: 'অনুষ্ঠানের ব্যান্ড পার্টি ও সাউন্ড ভাড়া।', icon: 'music', tone: 'accent', addable: true },
-  graphics: { title: 'গ্রাফিক্স ডিজাইনার ও প্রিন্টিং প্রেস', description: 'ডিজাইন, ব্যানার ও ছাপার কাজ। কাজ করিয়ে রেটিং দিন।', icon: 'printer', tone: 'info', ratable: true, addable: true },
+  graphics: { title: 'গ্রাফিক্স ডিজাইনার ও প্রিন্টিং প্রেস', description: 'ডিজাইন, ব্যানার ও ছাপার কাজ।', icon: 'printer', tone: 'info', ratable: true, addable: true },
 };
 
 export const addEntrySchema = z.object({

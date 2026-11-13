@@ -40,7 +40,7 @@ export function ListingForm() {
 
   return (
     <div className="container-narrow flex flex-col gap-5">
-      <PageHeader eyebrow="কেনাবেচা" title="বিক্রির বিজ্ঞাপন দিন" back={{ href: '/buy-sell', label: 'কেনাবেচা' }} description="সাইন ইন করে দুই ধাপে শেষ।" />
+      <PageHeader eyebrow="কেনাবেচা" title="বিক্রির বিজ্ঞাপন দিন" back={{ href: '/buy-sell', label: 'কেনাবেচা' }} />
       {done ? (
         <PostedSuccess title="বিজ্ঞাপন প্রকাশিত হয়েছে" href="/buy-sell" listLabel="কেনাবেচা দেখুন" />
       ) : (

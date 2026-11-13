@@ -54,7 +54,7 @@ export function ManageDialog({
       icon={confirmDelete ? 'trash' : 'edit'}
       tone={confirmDelete ? 'emergency' : undefined}
       title={confirmDelete ? 'পোস্টটি মুছে ফেলবেন?' : 'পোস্ট পরিচালনা'}
-      description={confirmDelete ? 'মুছে ফেলা পোস্ট আর ফিরিয়ে আনা যাবে না।' : 'আপনার সব পোস্ট ‘আমার অ্যাকাউন্ট’ থেকেও সামলাতে পারবেন।'}
+      description={confirmDelete ? 'মুছে ফেলা পোস্ট আর ফিরিয়ে আনা যাবে না।' : undefined}
       actions={
         confirmDelete ? (
           <>
@@ -74,6 +74,9 @@ export function ManageDialog({
             )}
             <Button variant="danger-ghost" iconLeft="trash" block disabled={pending} onClick={() => setConfirmDelete(true)}>
               মুছে ফেলুন
+            </Button>
+            <Button variant="ghost" href="/account" iconLeft="user" block>
+              আমার সব পোস্ট
             </Button>
           </>
         )
@@ -111,7 +114,7 @@ export function ReportDialog({
       icon="flag"
       tone="emergency"
       title="পোস্টটি রিপোর্ট করুন"
-      description="কেন রিপোর্ট করছেন? অ্যাডমিন দেখে ব্যবস্থা নেবেন।"
+     
       actions={
         <>
           <Button

@@ -7,7 +7,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { useDebounce } from '@/hooks/useDebounce';
 import { flatPages, totalOf } from '@/lib/community';
 import { applyApiErrors } from '@/lib/form';
-import { cn } from '@/lib/utils';
+import { ADMIN_PHONE } from '@/config/services';
+import { cn, telHref } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { TextField } from '@/components/ui/Field';
@@ -55,10 +56,8 @@ export function WorkerList() {
   const clear = () => void setParams({ q: null, trade: null });
   return (
     <div className="container-page flex flex-col gap-5">
-      <PageHeader eyebrow="মিস্ত্রি ও যানবাহন" title="দক্ষ কারিগর" description="রাজমিস্ত্রি, ইলেকট্রিশিয়ান, মেকানিক, দর্জি — কাজ বেছে নিয়ে সরাসরি কল করুন।" action={<Button href="/workers/register" variant="secondary" iconLeft="plus">নিজের নাম যুক্ত করুন</Button>} />
-      <NoticeBanner>
-        <p>কাজ শুরুর আগে মজুরি ঠিক করে নিন। কারো কাজ নিয়ে অভিযোগ থাকলে অ্যাডমিনকে জানান।</p>
-      </NoticeBanner>
+      <PageHeader eyebrow="মিস্ত্রি ও যানবাহন" title="দক্ষ কারিগর" action={<Button href="/workers/register" variant="secondary" iconLeft="plus">নিজের নাম যুক্ত করুন</Button>} />
+      <NoticeBanner items={['কাজ শুরুর আগে মজুরি ঠিক করে নিন।', 'কারো কাজ নিয়ে অভিযোগ থাকলে অ্যাডমিনকে জানান।']} action={<Button href={telHref(ADMIN_PHONE)} size="sm" variant="secondary" iconLeft="phone">অ্যাডমিন</Button>} />
       <FilterBar
         query={q}
         onQuery={(v) => void setParams({ q: v || null })}
@@ -98,7 +97,7 @@ export function WorkerRegisterForm() {
   const submit = form.handleSubmit((v) => register.mutate(v, { onSuccess: () => setDone(true), onError: (e) => applyApiErrors(form, e) }));
   return (
     <div className="container-narrow flex flex-col gap-5">
-      <PageHeader eyebrow="দক্ষ কারিগর" title="নিজের নাম যুক্ত করুন" back={{ href: '/workers', label: 'দক্ষ কারিগর' }} description="আপনার কাজ বেছে নিন। মানুষ কাজ বেছে আপনাকে সরাসরি কল করবে।" />
+      <PageHeader eyebrow="দক্ষ কারিগর" title="নিজের নাম যুক্ত করুন" back={{ href: '/workers', label: 'দক্ষ কারিগর' }} />
       {done ? (
         <Alert tone="success" title="নিবন্ধন সম্পন্ন হয়েছে" action={<Button href="/workers" size="sm" variant="secondary">তালিকা দেখুন</Button>} />
       ) : (

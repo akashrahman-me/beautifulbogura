@@ -85,7 +85,7 @@ export function AreaProfilePage() {
 export function UnionsPage() {
   const { data, isPending, isError, error, refetch } = useUnions();
   return (
-    <AreaShell title="ইউনিয়নসমূহ" description="প্রতিটি ইউনিয়ন পরিষদের যোগাযোগ, গ্রাম ও হাট-বাজার।" current="/area/unions">
+    <AreaShell title="ইউনিয়নসমূহ" current="/area/unions">
       {isPending ? (
         <TextSkeleton k="unions" rows={8} />
       ) : isError ? (
@@ -127,7 +127,7 @@ export function UnionsPage() {
 export function AdministrationPage() {
   const { data, isPending, isError, error, refetch } = useAdministration();
   return (
-    <AreaShell title="প্রশাসন" description="উপজেলা প্রশাসনের কর্মকর্তারা।" current="/area/administration">
+    <AreaShell title="প্রশাসন" current="/area/administration">
       {isPending ? (
         <TextSkeleton k="admin" rows={5} />
       ) : isError ? (

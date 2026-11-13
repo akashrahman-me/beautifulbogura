@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { applyApiErrors } from '@/lib/form';
 import { bn, WEEKDAYS_SHORT } from '@/lib/utils';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Select, TextField } from '@/components/ui/Field';
 import { ChoiceGroup } from '@/components/ui/Interactive';
@@ -43,7 +44,7 @@ export function DoctorForm() {
 
   return (
     <div className="container-narrow flex flex-col gap-5">
-      <PageHeader title="ডাক্তার যুক্ত করুন" back={{ href: '/doctors', label: 'ডাক্তারদের তালিকা' }} description="অ্যাডমিন যাচাই করার পর তালিকায় প্রকাশিত হবে। * চিহ্নিত ঘর পূরণ করা আবশ্যক।" />
+      <PageHeader title="ডাক্তার যুক্ত করুন" back={{ href: '/doctors', label: 'ডাক্তারদের তালিকা' }} meta={<Badge tone="info" icon="verified">অ্যাডমিন যাচাইয়ের পর প্রকাশিত হবে</Badge>} />
       <form onSubmit={onSubmit} noValidate className="flex flex-col gap-6">
         <fieldset className="flex flex-col gap-5 rounded-lg border border-line bg-surface p-5">
           <legend className="text-h4 px-1">ডাক্তারের তথ্য</legend>
@@ -57,7 +58,7 @@ export function DoctorForm() {
               <ChoiceGroup multiple label="ডিগ্রি" options={DEGREES.map((d) => ({ value: d, label: d }))} value={field.value} onChange={field.onChange} />
             )}
           />
-          {degrees.includes('অন্যান্য') && <TextField label="অন্যান্য ডিগ্রি" hint="কমা দিয়ে আলাদা করুন" {...form.register('degreesOther')} />}
+          {degrees.includes('অন্যান্য') && <TextField label="অন্যান্য ডিগ্রি" placeholder="যেমন: এফসিপিএস, এমডি" {...form.register('degreesOther')} />}
           <TextField label="মোবাইল নম্বর" required inputMode="tel" icon="phone" {...form.register('phone')} error={errors.phone?.message} />
         </fieldset>
 

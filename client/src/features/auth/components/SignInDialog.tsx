@@ -7,7 +7,7 @@ export function SignInDialog({
   open,
   onOpenChange,
   title = 'সাইন ইন করুন',
-  description = 'Google, Facebook বা Apple অ্যাকাউন্ট দিয়ে এক ক্লিকে।',
+  description,
   returnTo,
 }: {
   open: boolean;

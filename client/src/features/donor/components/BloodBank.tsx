@@ -3,7 +3,8 @@
 import { parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs';
 import { useDebounce } from '@/hooks/useDebounce';
 import { flatPages, totalOf } from '@/lib/community';
-import { bnNumber, cn } from '@/lib/utils';
+import { ADMIN_PHONE } from '@/config/services';
+import { bnNumber, cn, telHref } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { FilterBar, LoadMore, NoticeBanner, PageHeader, StatStrip } from '@/components/shared/Blocks';
 import { CardGridSkeleton, Skeleton, StatStripSkeleton } from '@/components/shared/Skeleton';
@@ -48,7 +49,7 @@ export function BloodBank() {
       <PageHeader
         eyebrow="জীবন বাঁচান"
         title="রক্ত ব্যাংক"
-        description="গ্রুপ বেছে নিন, তারপর ‘রক্ত দিতে প্রস্তুত’ দাতাকে সরাসরি কল করুন। শেষ রক্তদানের ১২০ দিন পর আবার রক্ত দেওয়া যায়।"
+        description="শেষ রক্তদানের ১২০ দিন পর আবার রক্ত দেওয়া যায়।"
         action={
           <Button href="/blood-bank/register" variant="emergency" iconLeft="drop">
             রক্তদাতা হোন
@@ -81,9 +82,10 @@ export function BloodBank() {
         <ErrorState error={stats.error} onRetry={stats.refetch} />
       ) : null}
 
-      <NoticeBanner>
-        <p>রক্ত দেওয়ার আগে দাতার শারীরিক অবস্থা জেনে নিন। কোনো দাতার তথ্য ভুল হলে বা কেউ তালিকা থেকে সরতে চাইলে অ্যাডমিনকে জানান। রক্তের বিনিময়ে টাকা চাওয়া হলে রিপোর্ট করুন।</p>
-      </NoticeBanner>
+      <NoticeBanner
+        items={['রক্ত দেওয়ার আগে দাতার শারীরিক অবস্থা জেনে নিন।', 'রক্তের বিনিময়ে টাকা চাওয়া হলে রিপোর্ট করুন।', 'কোনো দাতার তথ্য ভুল হলে বা কেউ তালিকা থেকে সরতে চাইলে অ্যাডমিনকে জানান।']}
+        action={<Button href={telHref(ADMIN_PHONE)} size="sm" variant="secondary" iconLeft="phone">অ্যাডমিন</Button>}
+      />
 
       <FilterBar
         query={q}

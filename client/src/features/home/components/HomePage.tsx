@@ -47,7 +47,6 @@ export function HomePage() {
 
       <section className="flex flex-col gap-3 rounded-lg border border-line bg-surface p-5">
         <h2 className="text-h2">আমাদের সাথে থাকুন</h2>
-        <p className="text-body-sm text-ink-muted">নতুন সেবা, জরুরি ঘোষণা আর রক্তের অনুরোধ সবার আগে পেতে অনুসরণ করুন।</p>
         <div className="flex flex-wrap gap-2">
           {SOCIAL.map((s) => (
             <Chip key={s.label} href={s.href}>

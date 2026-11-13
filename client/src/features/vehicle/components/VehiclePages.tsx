@@ -37,8 +37,8 @@ function VehicleCard({ v, fav, onFav, now }: { v: Vehicle; fav: boolean; onFav: 
         <div className="bb-dcard-id flex-1">
           <div className="bb-badges">
             <Badge tone="accent">{vehicleTypeLabel(v.type)}</Badge>
-            {v.featured && <Badge tone="featured">ফিচার্ড</Badge>}
-            {v.verified && <Badge tone="verified">যাচাইকৃত</Badge>}
+            {v.featured && <Badge tone="featured" title="অ্যাডমিন উপরে রেখেছেন">ফিচার্ড</Badge>}
+            {v.verified && <Badge tone="verified" title="মালিকের কাগজপত্র অ্যাডমিন দেখেছেন">যাচাইকৃত</Badge>}
           </div>
           <h3 className="bb-card-title">{v.ownerName}</h3>
           {now && <p className="bb-dcard-role">{timeAgo(v.createdAt, now)}</p>}
@@ -69,10 +69,8 @@ export function VehicleList() {
 
   return (
     <div className="container-page flex flex-col gap-5">
-      <PageHeader eyebrow="ভাড়া" title="গাড়ি ভাড়া" description="প্রাইভেট কার, মাইক্রো, বাস ও ট্রাক — মালিক বা চালককে সরাসরি কল করুন।" action={<Button href="/car-rent/new" iconLeft="plus">গাড়ির তথ্য দিন</Button>} />
-      <NoticeBanner>
-        <p>‘ফিচার্ড’ গাড়িগুলো অ্যাডমিন উপরে রেখেছেন, ‘যাচাইকৃত’ মালিকের কাগজপত্র দেখা হয়েছে। ভাড়া ঠিক করার আগে গাড়ি ও চালকের কাগজ দেখে নিন।</p>
-      </NoticeBanner>
+      <PageHeader eyebrow="ভাড়া" title="গাড়ি ভাড়া" action={<Button href="/car-rent/new" iconLeft="plus">গাড়ির তথ্য দিন</Button>} />
+      <NoticeBanner items={['ভাড়া ঠিক করার আগে গাড়ি ও চালকের কাগজ দেখে নিন।']} />
       <Tabs
         label="গাড়ির ধরন"
         value={tab}
@@ -111,7 +109,7 @@ export function VehicleForm() {
   const submit = form.handleSubmit((v) => create.mutate(v, { onSuccess: () => setDone(true), onError: (e) => applyApiErrors(form, e) }));
   return (
     <div className="container-narrow flex flex-col gap-5">
-      <PageHeader eyebrow="গাড়ি ভাড়া" title="গাড়ির তথ্য দিন" back={{ href: '/car-rent', label: 'গাড়ি ভাড়া' }} description="সাইন ইন করে পোস্ট দিন। ফিচার্ড বা যাচাইকৃত হতে অ্যাডমিনের সাথে যোগাযোগ করুন।" />
+      <PageHeader eyebrow="গাড়ি ভাড়া" title="গাড়ির তথ্য দিন" back={{ href: '/car-rent', label: 'গাড়ি ভাড়া' }} />
       {done ? (
         <PostedSuccess title="গাড়ির তথ্য প্রকাশিত হয়েছে" href="/car-rent" listLabel="গাড়ি ভাড়া দেখুন" />
       ) : (

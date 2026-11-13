@@ -10,7 +10,8 @@ import { Icon, type IconName } from '@/components/ui/Icon';
 import { SearchField } from '@/components/ui/Interactive';
 
 /* ---------- PageHeader ---------- */
-export function PageHeader({ title, eyebrow, description, back, action, className }: { title: ReactNode; eyebrow?: string; description?: ReactNode; back?: { href: string; label: string }; action?: ReactNode; className?: string }) {
+/** `meta`: short facts shown as badges under the title (expiry, review) — prefer it over a sentence in `description`. */
+export function PageHeader({ title, eyebrow, description, meta, back, action, className }: { title: ReactNode; eyebrow?: string; description?: ReactNode; meta?: ReactNode; back?: { href: string; label: string }; action?: ReactNode; className?: string }) {
   return (
     <header className={cn('flex flex-col gap-3 pt-5 pb-4 lg:pt-8', className)}>
       {back && (
@@ -24,6 +25,7 @@ export function PageHeader({ title, eyebrow, description, back, action, classNam
           {eyebrow && <p className="text-overline text-accent">{eyebrow}</p>}
           <h1 className="text-display-lg">{title}</h1>
           {description && <p className="text-body-sm max-w-2xl text-ink-muted">{description}</p>}
+          {meta && <div className="flex flex-wrap gap-2 pt-1">{meta}</div>}
         </div>
         {action}
       </div>
@@ -116,8 +118,8 @@ export function PhoneLink({ phone }: { phone: string }) {
   );
 }
 
-/* ---------- NoticeBanner: the “জরুরি বার্তা” moderation notice ---------- */
-export function NoticeBanner({ title = 'জরুরি বার্তা', children, action, defaultOpen = false }: { title?: string; children: ReactNode; action?: ReactNode; defaultOpen?: boolean }) {
+/* ---------- NoticeBanner: the “জরুরি বার্তা” safety notice, one short tip per line ---------- */
+export function NoticeBanner({ title = 'জরুরি বার্তা', items, children, action, defaultOpen = false }: { title?: string; items?: ReactNode[]; children?: ReactNode; action?: ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <section className="bb-notice">
@@ -130,6 +132,16 @@ export function NoticeBanner({ title = 'জরুরি বার্তা', chi
       </button>
       {open && (
         <div className="bb-notice-body">
+          {items && (
+            <ul className="flex flex-col gap-1.5">
+              {items.map((it, i) => (
+                <li key={i} className="flex gap-2">
+                  <Icon name="alert" size={16} className="mt-1 shrink-0" />
+                  <span>{it}</span>
+                </li>
+              ))}
+            </ul>
+          )}
           {children}
           {action && <div className="bb-notice-action">{action}</div>}
         </div>

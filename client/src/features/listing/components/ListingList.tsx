@@ -53,12 +53,9 @@ export function ListingList() {
       <PageHeader
         eyebrow="কমিউনিটি"
         title="কেনাবেচা"
-        description="পুরনো বা নতুন জিনিস বিক্রি করুন, কিনুন — সরাসরি বিক্রেতার সাথে কথা বলে।"
         action={<Button href="/buy-sell/new" iconLeft="plus">বিক্রি করুন</Button>}
       />
-      <NoticeBanner>
-        <p>টাকা দেওয়ার আগে পণ্য নিজে দেখে নিন। অগ্রিম টাকা চাইলে সতর্ক থাকুন এবং ‘রিপোর্ট’ করুন। বিক্রি হয়ে গেলে ‘আমার অ্যাকাউন্ট’ থেকে ‘বিক্রি হয়ে গেছে’ চিহ্নিত করুন।</p>
-      </NoticeBanner>
+      <NoticeBanner items={['টাকা দেওয়ার আগে পণ্য নিজে দেখে নিন।', 'অগ্রিম টাকা চাইলে সতর্ক থাকুন এবং ‘রিপোর্ট’ করুন।']} />
       <FilterBar
         query={q}
         onQuery={(v) => void setParams({ q: v || null })}

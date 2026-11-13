@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { applyApiErrors } from '@/lib/form';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Checkbox, Select, TextArea, TextField } from '@/components/ui/Field';
 import { FileDrop } from '@/components/ui/FileDrop';
@@ -44,7 +45,7 @@ export function RentalForm() {
 
   return (
     <div className="container-narrow flex flex-col gap-5">
-      <PageHeader eyebrow="বাসা ভাড়া" title="বাসার বিজ্ঞাপন দিন" back={{ href: '/to-let', label: 'বাসা ভাড়া' }} description="তিন ধাপে শেষ। বিজ্ঞাপন ৩০ দিন দেখা যাবে।" />
+      <PageHeader eyebrow="বাসা ভাড়া" title="বাসার বিজ্ঞাপন দিন" back={{ href: '/to-let', label: 'বাসা ভাড়া' }} meta={<Badge tone="neutral" icon="clock">৩০ দিন দেখা যাবে</Badge>} />
       {done ? (
         <PostedSuccess title="বাসা ভাড়ার বিজ্ঞাপন প্রকাশিত হয়েছে" href="/to-let" listLabel="বাসা ভাড়া দেখুন" days="৩০ দিন" />
       ) : (
@@ -71,7 +72,7 @@ export function RentalForm() {
                 <Select label="রুম" required options={Array.from({ length: 8 }, (_, i) => ({ value: String(i + 1), label: `${'১২৩৪৫৬৭৮'[i]} রুম` }))} {...form.register('rooms')} error={errors.rooms?.message} />
               </div>
               <div className="flex flex-col">
-                <Controller control={form.control} name="gas" render={({ field }) => <Checkbox label="গ্যাস সংযোগ আছে" description="লাইনের গ্যাস; সিলিন্ডার হলে বিবরণে লিখুন" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />} />
+                <Controller control={form.control} name="gas" render={({ field }) => <Checkbox label="লাইনের গ্যাস আছে" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />} />
                 <Controller control={form.control} name="attachedBath" render={({ field }) => <Checkbox label="অ্যাটাচড বাথরুম" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />} />
               </div>
               <TextField label="শিরোনাম" required placeholder="২ রুমের ফ্ল্যাট, মালতীনগর" {...form.register('title')} error={errors.title?.message} />
@@ -82,7 +83,7 @@ export function RentalForm() {
 
             <fieldset className={card} hidden={step !== 2}>
               <legend className="text-h4 px-1">ছবি</legend>
-              <Controller control={form.control} name="images" render={({ field }) => <FileDrop label="বাসার ছবি" optional max={5} value={field.value} onChange={field.onChange} hint="ছবিসহ বিজ্ঞাপনে বেশি সাড়া পাওয়া যায়।" />} />
+              <Controller control={form.control} name="images" render={({ field }) => <FileDrop label="বাসার ছবি" optional max={5} value={field.value} onChange={field.onChange} />} />
               <input type="text" tabIndex={-1} autoComplete="off" aria-hidden className="bb-sr" {...form.register('website')} />
               {errors.root && <Alert tone="danger" title={errors.root.message} />}
             </fieldset>

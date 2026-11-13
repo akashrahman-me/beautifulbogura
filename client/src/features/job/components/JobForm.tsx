@@ -28,7 +28,7 @@ export function JobForm() {
 
   return (
     <div className="container-narrow flex flex-col gap-5">
-      <PageHeader eyebrow="চাকরির খবর" title="চাকরির বিজ্ঞাপন দিন" back={{ href: '/jobs', label: 'চাকরির খবর' }} description="Google, Facebook বা Apple দিয়ে সাইন ইন করে পোস্ট দিন। সাথে সাথে প্রকাশিত হবে।" />
+      <PageHeader eyebrow="চাকরির খবর" title="চাকরির বিজ্ঞাপন দিন" back={{ href: '/jobs', label: 'চাকরির খবর' }} />
       {done ? (
         <PostedSuccess title="বিজ্ঞাপন প্রকাশিত হয়েছে" href="/jobs" listLabel="চাকরির খবর দেখুন" days={done} />
       ) : (

@@ -33,8 +33,6 @@ export function NotificationPrompt() {
           চালু করুন
         </Button>
       }
-    >
-      নোটিফিকেশন চালু করলে গুরুত্বপূর্ণ ঘোষণা সাথে সাথে পাবেন।
-    </Alert>
+    />
   );
 }

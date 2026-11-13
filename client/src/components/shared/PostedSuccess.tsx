@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/Button';
+import { Icon } from '@/components/ui/Icon';
 import { Alert } from '@/components/ui/Misc';
 
 /** Shown after a community post is published: where to see it, and where to manage it later. */
@@ -18,7 +19,12 @@ export function PostedSuccess({ title, href, listLabel, days }: { title: string;
         </div>
       }
     >
-      <p>{days ? `পোস্টটি ${days} দেখা যাবে, তারপর নিজে থেকেই সরে যাবে। ` : ''}মুছে ফেলতে বা ‘সম্পন্ন’ করতে যেকোনো সময় ‘আমার অ্যাকাউন্ট’-এ যান — একই অ্যাকাউন্ট দিয়ে সাইন ইন করলেই হবে।</p>
+      {days && (
+        <p className="flex items-center gap-1.5">
+          <Icon name="clock" size={16} />
+          {days} দেখা যাবে, তারপর নিজে থেকেই সরে যাবে।
+        </p>
+      )}
     </Alert>
   );
 }

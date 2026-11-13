@@ -22,16 +22,13 @@ export function JobList() {
       <PageHeader
         eyebrow="চাকরি ও কেনাবেচা"
         title="চাকরির খবর"
-        description="বগুড়ার দোকান, অফিস আর প্রতিষ্ঠানের চাকরি। আবেদনের শেষ তারিখ দেখে সরাসরি যোগাযোগ করুন।"
         action={
           <Button href="/jobs/new" iconLeft="plus">
             চাকরির বিজ্ঞাপন দিন
           </Button>
         }
       />
-      <NoticeBanner>
-        <p>বিজ্ঞাপন দিতে Google, Facebook বা Apple দিয়ে সাইন ইন করুন — আলাদা অ্যাকাউন্ট খুলতে হয় না। পরে ‘আমার অ্যাকাউন্ট’ থেকে বিজ্ঞাপন মুছে ফেলতে বা ‘নিয়োগ সম্পন্ন’ করতে পারবেন। চাকরির জন্য টাকা চাওয়া হলে রিপোর্ট করুন।</p>
-      </NoticeBanner>
+      <NoticeBanner items={['চাকরির জন্য টাকা চাওয়া হলে রিপোর্ট করুন।']} />
       <FilterBar query={q} onQuery={(v) => void setQ(v || null)} placeholder="প্রতিষ্ঠান, পদ বা এলাকা" count={list.isPending ? undefined : totalOf(list.data)} countLabel="টি সক্রিয় বিজ্ঞাপন" onClear={q ? () => void setQ(null) : undefined} />
       {list.isPending ? (
         <CardGridSkeleton count={6} height={250} keyPrefix="job" />

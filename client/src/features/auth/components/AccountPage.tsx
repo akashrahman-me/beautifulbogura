@@ -40,7 +40,7 @@ export function AccountPage() {
   if (!user) {
     return (
       <div className="container-narrow flex flex-col gap-5">
-        <PageHeader title="সাইন ইন করুন" description="আপনার পোস্টগুলো দেখতে ও সামলাতে Google, Facebook বা Apple দিয়ে সাইন ইন করুন।" />
+        <PageHeader title="সাইন ইন করুন" />
         <section className="rounded-lg border border-line bg-surface p-5">
           <SignInOptions returnTo="/account" />
         </section>

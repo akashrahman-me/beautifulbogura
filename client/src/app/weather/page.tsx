@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: 'আবহাওয়া' };
 export default function WeatherPage() {
   return (
     <div className="container-narrow flex flex-col gap-4">
-      <PageHeader title="আবহাওয়া" description="বগুড়ার এখনকার আবহাওয়া আর আগামী তিন দিনের পূর্বাভাস।" />
+      <PageHeader title="আবহাওয়া" />
       <WeatherCard />
     </div>
   );

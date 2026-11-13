@@ -26,17 +26,26 @@ export function DirectoryList({ type }: { type: string }) {
         title={config.title}
         description={config.description}
         back={{ href: '/services', label: 'সব সেবা' }}
-        action={config.addable ? <Button href={`/directory/${type}/add`} variant="secondary" iconLeft="plus">তথ্য যুক্ত করুন</Button> : undefined}
+        action={
+          <div className="flex flex-wrap gap-2">
+            {config.emergency && (
+              <Button href={telHref('999')} variant="emergency" iconLeft="phone">
+                ৯৯৯
+              </Button>
+            )}
+            {config.addable && (
+              <Button href={`/directory/${type}/add`} variant="secondary" iconLeft="plus">
+                তথ্য যুক্ত করুন
+              </Button>
+            )}
+          </div>
+        }
       />
 
-      <NoticeBanner>
-        <p>
-          এই তালিকায় আপনার তথ্য যুক্ত করতে {config.addable ? '“তথ্য যুক্ত করুন” বোতামে চাপুন অথবা ' : ''}অ্যাডমিনের সাথে যোগাযোগ করুন। ভুল তথ্য সংশোধন বা মুছে ফেলতেও অ্যাডমিনকে জানান:{' '}
-          <a className="font-semibold underline underline-offset-2" href={telHref(ADMIN_PHONE)}>
-            {formatPhone(ADMIN_PHONE)}
-          </a>
-        </p>
-      </NoticeBanner>
+      <NoticeBanner
+        items={[config.addable ? 'নিজের তথ্য যুক্ত করতে “তথ্য যুক্ত করুন” বোতাম ব্যবহার করুন।' : 'এই তালিকায় তথ্য যুক্ত করতে অ্যাডমিনকে জানান।', 'ভুল তথ্য সংশোধন বা মুছে ফেলতে অ্যাডমিনকে জানান।']}
+        action={<Button href={telHref(ADMIN_PHONE)} size="sm" variant="secondary" iconLeft="phone">{formatPhone(ADMIN_PHONE)}</Button>}
+      />
 
       <FilterBar query={q} onQuery={(v) => void setQ(v || null)} placeholder="নাম, ঠিকানা বা নম্বর দিয়ে খুঁজুন" count={isPending ? undefined : totalOf(data)} countLabel={config.countLabel ?? 'টি তথ্য'} onClear={q ? () => void setQ(null) : undefined} />
 

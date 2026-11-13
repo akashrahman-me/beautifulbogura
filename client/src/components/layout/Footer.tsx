@@ -1,5 +1,7 @@
 import Link from 'next/link';
-import { SOCIAL } from '@/config/services';
+import { ADMIN_PHONE, SOCIAL } from '@/config/services';
+import { telHref } from '@/lib/utils';
+import { Button } from '@/components/ui/Button';
 import { Wordmark } from '@/components/ui/Misc';
 
 export function Footer() {
@@ -8,9 +10,14 @@ export function Footer() {
       <div className="container-page flex flex-col gap-8 pt-10 md:flex-row md:justify-between">
         <div className="flex max-w-sm flex-col gap-3">
           <Wordmark tagline="বগুড়ার সব সেবা, এক জায়গায়" />
-          <p className="text-body-sm text-ink-muted">
-            তথ্য যুক্ত, সংশোধন বা মুছে ফেলতে অ্যাডমিনের সাথে যোগাযোগ করুন। জরুরি প্রয়োজনে সবসময় আগে ৯৯৯ নম্বরে কল করুন।
-          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button href={telHref('999')} size="sm" variant="emergency" iconLeft="phone">
+              জরুরি ৯৯৯
+            </Button>
+            <Button href={telHref(ADMIN_PHONE)} size="sm" variant="secondary" iconLeft="phone" title="তথ্য যুক্ত, সংশোধন বা মুছে ফেলতে">
+              অ্যাডমিন
+            </Button>
+          </div>
         </div>
         <nav className="grid grid-cols-2 gap-x-10 gap-y-2 text-body-sm" aria-label="ফুটার">
           <Link href="/services" className="hover:text-brand">সব সেবা</Link>

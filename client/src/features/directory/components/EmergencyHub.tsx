@@ -34,7 +34,7 @@ function EmergencySection({ type }: { type: string }) {
 export function EmergencyHub() {
   return (
     <div className="container-page flex flex-col gap-8">
-      <PageHeader title="জরুরি সেবা" description="বিপদে প্রথমে ৯৯৯ নম্বরে কল করুন। নিচে স্থানীয় নম্বরগুলো আছে, চাপ দিলেই কল হবে।" />
+      <PageHeader title="জরুরি সেবা" />
       <div className="max-w-xl">
         <EmergencyCard />
       </div>

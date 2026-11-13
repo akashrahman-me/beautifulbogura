@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import type { z } from 'zod';
 import { applyApiErrors } from '@/lib/form';
+import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { Checkbox, TextArea, TextField } from '@/components/ui/Field';
 import { Alert } from '@/components/ui/Misc';
@@ -35,7 +36,7 @@ export function AddEntryForm({ type }: { type: string }) {
 
   return (
     <div className="container-narrow flex flex-col gap-5">
-      <PageHeader title="তথ্য যুক্ত করুন" eyebrow={config.title} back={{ href: `/directory/${type}`, label: config.title }} description="অ্যাডমিন যাচাই করে প্রকাশ করবেন। সাধারণত ২৪ ঘণ্টার মধ্যে।" />
+      <PageHeader title="তথ্য যুক্ত করুন" eyebrow={config.title} back={{ href: `/directory/${type}`, label: config.title }} meta={<><Badge tone="info" icon="verified">অ্যাডমিন যাচাই করে প্রকাশ করবেন</Badge><Badge tone="neutral" icon="clock">সাধারণত ২৪ ঘণ্টার মধ্যে</Badge></>} />
       {done ? (
         <Alert
           tone="success"

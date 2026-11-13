@@ -5,6 +5,7 @@ import { parseAsString, useQueryState } from 'nuqs';
 import { SERVICES } from '@/config/services';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
+import { Chip } from '@/components/ui/Chip';
 import { Icon, type IconName } from '@/components/ui/Icon';
 import { SearchField } from '@/components/ui/Interactive';
 import { PageHeader, SectionHeader } from '@/components/shared/Blocks';
@@ -21,6 +22,8 @@ const KIND: Record<SearchHit['kind'], { label: string; icon: IconName }> = {
   job: { label: 'চাকরি', icon: 'briefcase' },
 };
 
+const SUGGESTIONS = ['শিশু', 'ব্যাংক', 'অ্যাম্বুলেন্স', 'হাসপাতাল', 'থানা', 'কলেজ'];
+
 /** Searches the service catalogue on the device and everything else through the API. */
 export function SearchPage() {
   const [q, setQ] = useQueryState('q', parseAsString.withDefault(''));
@@ -31,11 +34,17 @@ export function SearchPage() {
 
   return (
     <div className="container-page flex flex-col gap-6">
-      <PageHeader title="খুঁজুন" description="ডাক্তার, অফিস, স্কুল, চাকরি — সব এক জায়গা থেকে।" />
+      <PageHeader title="খুঁজুন" />
       <SearchField size="lg" value={q} onChange={(v) => void setQ(v || null)} autoFocus />
 
       {term.length < 2 ? (
-        <p className="text-body-sm text-ink-muted">অন্তত দুটি অক্ষর লিখুন। যেমন: “শিশু”, “ব্যাংক”, “অ্যাম্বুলেন্স”।</p>
+        <div className="flex flex-wrap gap-2" aria-label="জনপ্রিয় খোঁজ">
+          {SUGGESTIONS.map((s) => (
+            <Chip key={s} icon="search" onClick={() => void setQ(s)}>
+              {s}
+            </Chip>
+          ))}
+        </div>
       ) : (
         <>
           {services.length > 0 && (
