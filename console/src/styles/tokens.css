@@ -1,0 +1,124 @@
+/*
+ * Beautiful Bogura design tokens — mirrors tokens.json in the design system
+ * (https://claude.ai/artifact/4BZ2R24ZRJDtLbCZ7fDEfN). Change values there first, then here.
+ * Light is the default; `data-theme="dark"` on <html> (set by src/lib/theme.ts) switches to dark.
+ */
+:root, [data-theme="light"] {
+  --canvas: #f7f4ee;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-sunken: #eee9df;
+  --line: #e3dccf;
+  --line-strong: #8a8275;
+  --ink: #1b1814;
+  --ink-muted: #575047;
+  --ink-subtle: #6d655a;
+  --brand: #0d5c4d;
+  --brand-strong: #094236;
+  --brand-soft: #dcefe8;
+  --on-brand: #ffffff;
+  --accent: #a8461f;
+  --accent-soft: #f8e6dc;
+  --on-accent: #ffffff;
+  --gold: #e0a82e;
+  --gold-soft: #fbf0d3;
+  --on-gold: #2a1e05;
+  --rating: #a87308;
+  --emergency: #c0182c;
+  --emergency-strong: #931020;
+  --emergency-soft: #fbe3e5;
+  --on-emergency: #ffffff;
+  --success: #17703d;
+  --success-soft: #ddf1e4;
+  --warning: #8a5300;
+  --warning-soft: #fcefd6;
+  --info: #1f5c9e;
+  --info-soft: #e1ecf8;
+  --focus: #2457c5;
+  --overlay: rgba(20, 16, 10, 0.56);
+
+  --shadow-xs: 0 1px 2px rgba(27, 24, 20, 0.06);
+  --shadow-sm: 0 1px 3px rgba(27, 24, 20, 0.08), 0 1px 2px rgba(27, 24, 20, 0.04);
+  --shadow-md: 0 6px 16px -4px rgba(27, 24, 20, 0.12), 0 2px 4px rgba(27, 24, 20, 0.05);
+  --shadow-lg: 0 16px 32px -8px rgba(27, 24, 20, 0.16), 0 4px 8px rgba(27, 24, 20, 0.06);
+  --shadow-xl: 0 28px 56px -12px rgba(27, 24, 20, 0.24);
+
+  --skeleton-base: #eee9df;
+  --skeleton-highlight: #f7f4ee;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --canvas: #0e1312;
+  --surface: #151b1a;
+  --surface-raised: #1c2423;
+  --surface-sunken: #0a0e0d;
+  --line: #27302e;
+  --line-strong: #66726f;
+  --ink: #eef0ec;
+  --ink-muted: #aab3af;
+  --ink-subtle: #8c9692;
+  --brand: #5cc4a8;
+  --brand-strong: #86d8c0;
+  --brand-soft: #133a32;
+  --on-brand: #04221b;
+  --accent: #ec8c62;
+  --accent-soft: #3d2116;
+  --on-accent: #2a0f04;
+  --gold: #e9b545;
+  --gold-soft: #3a2d0e;
+  --on-gold: #241900;
+  --rating: #e9b545;
+  --emergency: #ff6b78;
+  --emergency-strong: #ff929b;
+  --emergency-soft: #3d1519;
+  --on-emergency: #2b0006;
+  --success: #5fcf8c;
+  --success-soft: #12301f;
+  --warning: #f0b34a;
+  --warning-soft: #3a2a0c;
+  --info: #7fb2f0;
+  --info-soft: #13263d;
+  --focus: #8fb4ff;
+  --overlay: rgba(0, 0, 0, 0.64);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 6px 16px -4px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 16px 32px -8px rgba(0, 0, 0, 0.7);
+  --shadow-xl: 0 28px 56px -12px rgba(0, 0, 0, 0.8);
+
+  --skeleton-base: #1c2423;
+  --skeleton-highlight: #27302e;
+  color-scheme: dark;
+}
+
+:root {
+  --space-0-5: 2px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --tap-min: 48px;
+  --container-max: 1200px;
+  --container-narrow: 720px;
+
+  --radius-full: 9999px;
+
+  --z-sticky: 100;
+  --z-dropdown: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+
+  /* next/font sets --font-anek and --font-noto on <html> */
+  --font-display: var(--font-anek), var(--font-noto), system-ui, sans-serif;
+  --font-sans: var(--font-noto), var(--font-anek), system-ui, sans-serif;
+}
