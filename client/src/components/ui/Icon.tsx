@@ -1,6 +1,7 @@
 /** The system's own outline icon set: 24px grid, 1.75 stroke, round caps, currentColor. */
 const ICONS = {
   search: ['c:11,11,7', 'M20 20l-3.5-3.5'],
+  play: ['M8 5.5v13l10.5-6.5z'],
   x: ['M6 6l12 12M18 6L6 18'],
   menu: ['M4 7h16M4 12h16M4 17h10'],
   sun: ['c:12,12,4', 'M12 2.5v2M12 19.5v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2.5 12h2M19.5 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4'],

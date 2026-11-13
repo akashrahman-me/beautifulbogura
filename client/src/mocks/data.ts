@@ -363,3 +363,123 @@ export const municipality = {
 
 /* ---------- popularity ---------- */
 export const popular = ['blood-bank', 'doctors', 'emergency', 'to-let', 'jobs', 'buy-sell', 'police', 'ambulance'];
+
+/* ---------- people lists (all fictional) ---------- */
+const MALE = ['মো. রফিকুল ইসলাম', 'আব্দুল করিম', 'শফিকুল আলম', 'মো. জাহাঙ্গীর হোসেন', 'নুরুল আমিন', 'আনোয়ার হোসেন', 'মো. মিজানুর রহমান', 'হাবিবুর রহমান', 'সাইফুল ইসলাম', 'আজিজুল হক', 'দেলোয়ার হোসেন', 'মোস্তফা কামাল'];
+const FEMALE = ['রাশিদা বেগম', 'নাসরিন আক্তার', 'শাহনাজ পারভীন', 'ফাতেমা খাতুন', 'মরিয়ম বেগম', 'সালমা আক্তার', 'রোকেয়া খাতুন', 'জান্নাতুল ফেরদৌস'];
+const FATHERS = ['মো. আব্দুস সামাদ', 'আলহাজ্ব ইউনুস আলী', 'মৃত আবুল কাশেম', 'মো. সিরাজুল ইসলাম', 'আব্দুল জব্বার', 'মৃত নজরুল ইসলাম'];
+const MOTHERS = ['আমেনা বেগম', 'হালিমা খাতুন', 'জাহানারা বেগম', 'মনোয়ারা বেগম', 'সুফিয়া খাতুন'];
+const VILLAGES = ['উত্তরপাড়া', 'দক্ষিণপাড়া', 'মধ্যপাড়া', 'পূর্বপাড়া', 'পশ্চিমপাড়া'];
+
+export const voters = Array.from({ length: 120 }, (_, i) => {
+  const female = i % 3 === 1;
+  const year = 1950 + ((i * 7) % 56);
+  return {
+    id: `vtr_${i + 1}`,
+    name: female ? FEMALE[i % FEMALE.length] : MALE[i % MALE.length],
+    fatherName: FATHERS[i % FATHERS.length],
+    motherName: MOTHERS[i % MOTHERS.length],
+    voterNo: String(100000000000 + i * 7919),
+    dob: `${year}-${String((i % 12) + 1).padStart(2, '0')}-${String((i % 27) + 1).padStart(2, '0')}`,
+    gender: female ? 'female' : 'male',
+    union: UNION_NAMES[i % UNION_NAMES.length],
+    village: VILLAGES[i % VILLAGES.length],
+    centre: `${UNION_NAMES[i % UNION_NAMES.length]} সরকারি প্রাথমিক বিদ্যালয়`,
+  };
+});
+
+export const freedomFighters = Array.from({ length: 42 }, (_, i) => ({
+  id: `ff_${i + 1}`,
+  name: MALE[i % MALE.length],
+  fatherName: FATHERS[(i + 2) % FATHERS.length],
+  idNo: String(1100 + i * 13),
+  village: VILLAGES[(i + 1) % VILLAGES.length],
+  union: UNION_NAMES[i % UNION_NAMES.length],
+  sector: i % 4 === 3 ? null : `${['৭', '৬', '১১'][i % 3]} নম্বর সেক্টর`,
+  alive: i % 3 !== 0,
+  photo: null as string | null,
+}));
+
+export const notablePersons = [
+  { name: 'অধ্যাপক মো. আব্দুল লতিফ', title: 'শিক্ষাবিদ ও ভাষাসৈনিক', field: 'education', born: '১৯২৮', died: '২০০৯' },
+  { name: 'বীর মুক্তিযোদ্ধা কামরুল হাসান', title: 'মুক্তিযুদ্ধের সংগঠক', field: 'liberation', born: '১৯৪৫', died: '২০১৮' },
+  { name: 'কবি সুলতানা রহমান', title: 'কবি ও প্রাবন্ধিক', field: 'literature', born: '১৯৫২', died: null },
+  { name: 'আলহাজ্ব নজরুল ইসলাম', title: 'সমাজসেবক ও দানবীর', field: 'social', born: '১৯৪০', died: '২০১৫' },
+  { name: 'শাহিন আলম', title: 'জাতীয় দলের সাবেক ফুটবলার', field: 'sports', born: '১৯৭৮', died: null },
+  { name: 'অ্যাডভোকেট রহিমা খাতুন', title: 'আইনজীবী ও নারী অধিকারকর্মী', field: 'politics', born: '১৯৬০', died: null },
+].map((p, i) => ({
+  ...p,
+  id: `np_${i + 1}`,
+  photo: null as string | null,
+  excerpt: `${p.name} বগুড়ার একজন ${p.title}। এলাকার মানুষের জন্য তাঁর অবদান আজও স্মরণীয়।`,
+  body: [
+    `${p.name} বগুড়া সদরের ${UNION_NAMES[i]} ইউনিয়নের ${VILLAGES[i % VILLAGES.length]} গ্রামে জন্মগ্রহণ করেন। শৈশব থেকেই তিনি পড়াশোনা ও সমাজের কাজে আগ্রহী ছিলেন।`,
+    `স্থানীয় বিদ্যালয়ে পড়াশোনা শেষে তিনি সরকারি আজিজুল হক কলেজে ভর্তি হন। এ সময় থেকেই তিনি ${p.title} হিসেবে পরিচিতি পেতে শুরু করেন।`,
+    'কর্মজীবনে তিনি এলাকার শিক্ষা, স্বাস্থ্য ও সামাজিক উন্নয়নে নানা উদ্যোগ নেন। তাঁর হাত ধরে গড়ে ওঠে একাধিক প্রতিষ্ঠান।',
+    'তাঁর জীবন ও কাজ নতুন প্রজন্মের জন্য অনুপ্রেরণা। বগুড়ার মানুষ তাঁকে শ্রদ্ধার সাথে স্মরণ করে।',
+  ].join('\n\n'),
+}));
+
+const CADRE_ROWS = [
+  ['admin', 'সহকারী কমিশনার (ভূমি)', 'উপজেলা ভূমি অফিস, শিবগঞ্জ'], ['police', 'সহকারী পুলিশ সুপার', 'পুলিশ সদর দপ্তর, ঢাকা'], ['foreign', 'দ্বিতীয় সচিব', 'বাংলাদেশ দূতাবাস, টোকিও'],
+  ['health', 'মেডিকেল অফিসার', 'শহীদ জিয়াউর রহমান মেডিকেল কলেজ হাসপাতাল'], ['education', 'প্রভাষক, গণিত', 'সরকারি আজিজুল হক কলেজ'], ['customs', 'সহকারী কমিশনার', 'চট্টগ্রাম কাস্টম হাউস'],
+  ['tax', 'সহকারী কর কমিশনার', 'কর অঞ্চল, রাজশাহী'], ['engineering', 'সহকারী প্রকৌশলী', 'এলজিইডি, বগুড়া'], ['agriculture', 'উপজেলা কৃষি কর্মকর্তা', 'উপজেলা কৃষি অফিস, ধুনট'], ['judicial', 'সহকারী জজ', 'জেলা জজ আদালত, নওগাঁ'],
+] as const;
+export const achievers = Array.from({ length: 24 }, (_, i) => {
+  const [cadre, post, workplace] = CADRE_ROWS[i % CADRE_ROWS.length];
+  return {
+    id: `ach_${i + 1}`,
+    name: i % 3 === 1 ? FEMALE[i % FEMALE.length] : MALE[(i + 5) % MALE.length],
+    cadre,
+    batch: `${['৩৫', '৩৬', '৩৭', '৩৮', '৪০', '৪১'][i % 6]}তম`,
+    post,
+    workplace,
+    village: VILLAGES[i % VILLAGES.length],
+    union: UNION_NAMES[(i + 3) % UNION_NAMES.length],
+    photo: null as string | null,
+  };
+});
+
+const PROFESSIONS = ['স্কুল শিক্ষক', 'ব্যাংক কর্মকর্তা', 'ব্যবসায়ী', 'সফটওয়্যার প্রকৌশলী', 'ডাক্তার', 'গৃহিণী', 'সরকারি চাকরিজীবী', 'শিক্ষার্থী'];
+export const matrimony = Array.from({ length: 10 }, (_, i) => {
+  const bride = i % 2 === 0;
+  return {
+    id: `mat_${i + 1}`,
+    gender: bride ? 'bride' : 'groom',
+    name: bride ? FEMALE[i % FEMALE.length] : MALE[i % MALE.length],
+    birthYear: new Date().getFullYear() - (bride ? 21 + (i % 8) : 25 + (i % 9)),
+    religion: i % 5 === 4 ? 'hindu' : 'islam',
+    maritalStatus: i === 7 ? 'divorced' : 'unmarried',
+    education: ['স্নাতক', 'স্নাতকোত্তর', 'এইচএসসি', 'ডিপ্লোমা'][i % 4],
+    profession: PROFESSIONS[i % PROFESSIONS.length],
+    familyMembers: 'বাবা (অবসরপ্রাপ্ত শিক্ষক), মা (গৃহিণী), ১ ভাই, ১ বোন',
+    preference: bride ? 'শিক্ষিত, চাকরিজীবী বা প্রতিষ্ঠিত ব্যবসায়ী, বগুড়া বা রাজশাহী বিভাগের' : 'শিক্ষিত, ধার্মিক ও পরিবারকেন্দ্রিক',
+    address: area(i + 1),
+    phone: phone(500 + i),
+    whatsapp: i % 3 !== 2,
+    photo: null as string | null,
+    createdAt: ago(i * 2 + 1),
+    status: 'active',
+  };
+});
+
+export const videos = [
+  ['মহাস্থানগড়: আড়াই হাজার বছরের পুণ্ড্রনগর', 'history', 734],
+  ['বগুড়ার দই: কীভাবে তৈরি হয়', 'food', 512],
+  ['করতোয়া নদীর পাড়ে এক বিকেল', 'tourism', 305],
+  ['বেহুলার বাসরঘর (গোকুল মেধ)', 'history', 621],
+  ['সাতমাথা থেকে শহর দর্শন', 'tourism', 418],
+  ['বগুড়ার নবান্ন উৎসব', 'culture', 389],
+  ['পৌরসভার নতুন সড়ক উদ্বোধন', 'news', 156],
+  ['আলুর বাজারে কৃষকের হাসি', 'news', 240],
+  ['লোকগানের আসর: ভাওয়াইয়া সন্ধ্যা', 'culture', 902],
+].map(([title, category, duration], i) => ({
+  id: `vid_${i + 1}`,
+  title: title as string,
+  // Demo ids are placeholders; real ones come from the API.
+  youtubeId: `demo${i + 1}`,
+  thumbnail: null as string | null,
+  category: category as string,
+  duration: duration as number,
+  publishedAt: ago(i * 6 + 2),
+}));

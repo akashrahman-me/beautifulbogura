@@ -15,6 +15,7 @@ export const POST_KINDS = {
   rental: { label: 'বাসা ভাড়া', base: '/rentals', doneLabel: 'ভাড়া হয়ে গেছে', doneBadge: 'ভাড়া হয়েছে' },
   vehicle: { label: 'গাড়ি ভাড়া', base: '/vehicles', doneLabel: undefined, doneBadge: 'বন্ধ' },
   tuition: { label: 'টিউশন', base: '/tuitions', doneLabel: 'পেয়ে গেছি', doneBadge: 'পেয়ে গেছেন' },
+  matrimony: { label: 'পাত্র-পাত্রী', base: '/matrimony', doneLabel: 'বিয়ে ঠিক হয়েছে', doneBadge: 'বিয়ে ঠিক হয়েছে' },
 } as const;
 export type PostKind = keyof typeof POST_KINDS;
 

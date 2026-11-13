@@ -13,8 +13,6 @@ export interface Service {
   href: string;
   category: ServiceCategory;
   keywords?: string;
-  /** Not built yet: shown in the grid, opens a “coming soon” page. */
-  soon?: boolean;
 }
 
 export const CATEGORIES: { value: 'all' | ServiceCategory; label: string }[] = [
@@ -81,12 +79,12 @@ export const SERVICES: Service[] = [
   { slug: 'cook', label: 'বাবুর্চি ও কসাই', icon: 'pot', tone: 'accent', href: dir('cook'), category: 'customer' },
   { slug: 'band-party', label: 'ব্যান্ড পার্টি', icon: 'music', tone: 'accent', href: dir('band-party'), category: 'customer', keywords: 'সাউন্ড সিস্টেম' },
   { slug: 'weather', label: 'আবহাওয়া', icon: 'cloud-sun', tone: 'info', href: '/weather', category: 'intro' },
-  { slug: 'voter-info', label: 'ভোটার তথ্য', icon: 'vote', tone: 'brand', href: '/soon/voter-info', category: 'public', soon: true },
-  { slug: 'freedom-fighters', label: 'মুক্তিযোদ্ধা', icon: 'medal', tone: 'gold', href: '/soon/freedom-fighters', category: 'lists', soon: true },
-  { slug: 'notable-persons', label: 'বিশিষ্ট ব্যক্তি', icon: 'user', tone: 'gold', href: '/soon/notable-persons', category: 'lists', soon: true },
-  { slug: 'bcs-cadres', label: 'কৃতি সন্তান', icon: 'medal', tone: 'info', href: '/soon/bcs-cadres', category: 'lists', soon: true },
-  { slug: 'marriage', label: 'পাত্র-পাত্রী', icon: 'rings', tone: 'accent', href: '/soon/marriage', category: 'marriage', soon: true },
-  { slug: 'videos', label: 'ভিডিও', icon: 'video', tone: 'info', href: '/soon/videos', category: 'intro', soon: true },
+  { slug: 'voter-info', label: 'ভোটার তথ্য', icon: 'vote', tone: 'brand', href: '/voter-info', category: 'public', keywords: 'ভোটার নম্বর এনআইডি' },
+  { slug: 'freedom-fighters', label: 'মুক্তিযোদ্ধা', icon: 'medal', tone: 'gold', href: '/freedom-fighters', category: 'lists', keywords: 'বীর মুক্তিযোদ্ধা গেজেট' },
+  { slug: 'notable-persons', label: 'বিশিষ্ট ব্যক্তি', icon: 'user', tone: 'gold', href: '/notable-persons', category: 'lists', keywords: 'জীবনী' },
+  { slug: 'bcs-cadres', label: 'কৃতি সন্তান', icon: 'medal', tone: 'info', href: '/achievers', category: 'lists', keywords: 'বিসিএস ক্যাডার' },
+  { slug: 'marriage', label: 'পাত্র-পাত্রী', icon: 'rings', tone: 'accent', href: '/marriage', category: 'marriage', keywords: 'বিয়ে পাত্র পাত্রী' },
+  { slug: 'videos', label: 'ভিডিও', icon: 'video', tone: 'info', href: '/videos', category: 'intro' },
 ];
 
 export const serviceBySlug = (slug: string) => SERVICES.find((s) => s.slug === slug);

@@ -58,7 +58,7 @@ There is no password, PIN or sign-up endpoint. A person signs in with **Google, 
 | `GET\|POST /auth/:provider/callback` | Provider redirect URI (Apple uses `form_post`). Verify `state` and the ID token, then upsert the user by `(provider, providerUserId)`; if the provider gives a **verified** email that matches an existing user, link to that user instead of creating a second one. Set the refresh token as an httpOnly, `Secure`, `SameSite=Lax` cookie (`None` only if the API is on an unrelated domain) and `302` to `NEXT_PUBLIC_APP_URL + returnTo`. On failure `302` to `/?authError=cancelled\|email_required\|provider_error`. |
 | `POST /auth/refresh` | Uses the cookie. → `{ accessToken, user }` where `user` = `{ id, name, email \| null, avatar \| null, provider }`. Rotate the refresh token. 401 `NO_SESSION` when signed out. |
 | `POST /auth/logout` | Revokes the refresh token and clears the cookie. |
-| `GET /me/posts` | Auth required. The caller's community posts across all kinds, newest first, excluding deleted: `MyPost[]` `{ kind: job\|listing\|rental\|vehicle\|tuition, id, title, status, createdAt, href }`. `href` is where the post is seen on the site (e.g. `/jobs/:id`, `/to-let`). |
+| `GET /me/posts` | Auth required. The caller's community posts across all kinds, newest first, excluding deleted: `MyPost[]` `{ kind: job\|listing\|rental\|vehicle\|tuition\|matrimony, id, title, status, createdAt, href }`. `href` is where the post is seen on the site (e.g. `/jobs/:id`, `/to-let`). |
 
 Authenticated calls send `Authorization: Bearer <accessToken>`. Missing / expired token → 401 `UNAUTHENTICATED` (the client refreshes once and retries).
 
@@ -66,7 +66,7 @@ Provider notes: Apple returns the user's name only on the very first sign-in, so
 
 ## Community posts (signed-in posting, owner-managed)
 
-Same shape for `/jobs`, `/listings` (buy & sell), `/rentals` (to-let), `/vehicles` (car rent), `/tuitions`. Every post carries `ownerId` (the poster's user id).
+Same shape for `/jobs`, `/listings` (buy & sell), `/rentals` (to-let), `/vehicles` (car rent), `/tuitions`, `/matrimony` (marriage biodata). Every post carries `ownerId` (the poster's user id).
 
 | Method & path | Notes |
 |---|---|
@@ -78,6 +78,22 @@ Same shape for `/jobs`, `/listings` (buy & sell), `/rentals` (to-let), `/vehicle
 | `POST {base}/:id/report` | Public. `{ reason: fake\|sold\|wrong-info\|other, note? }` |
 
 Featured / verified flags are admin-only and never accepted from these endpoints.
+
+## Matrimonial (`/matrimony`)
+
+A community post (above): sign-in to create, owner-only manage, `mark-done` = “বিয়ে ঠিক হয়েছে” and drops the profile from the list.
+`GET /matrimony?gender=bride|groom&religion&search` → paginated `Matrimonial` `{ id, ownerId, gender, name, birthYear, religion, maritalStatus, education, profession, familyMembers, preference, address, phone, whatsapp, photo, createdAt, status }`.
+`POST /matrimony` body: the same fields minus server-set ones, `photo` as an `/uploads` URL or null. Reject when the age from `birthYear` is under the legal minimum (bride 18, groom 21) with 422 `VALIDATION` on `birthYear`. Rate-limit per user; a confirmed fake profile should block the account.
+
+## Public records & media
+
+| Method & path | Notes |
+|---|---|
+| `GET /voters?union&search&dob&birthYear` | Paginated `Voter` `{ id, name, fatherName, motherName, voterNo, dob, gender, union, village, centre }`. **Requires** `search` (≥ 3 chars, name or voter no.) or `dob` (yyyy-mm-dd) or `birthYear`; otherwise 422 `FILTER_REQUIRED`, so the roll cannot be paged through. Rate-limit per IP. |
+| `GET /freedom-fighters?union&search` | Paginated `FreedomFighter` `{ id, name, fatherName, idNo, village, union, sector \| null, alive, photo \| null }`; `meta.total` is shown as the count |
+| `GET /achievers?cadre&search` | Paginated `Achiever` `{ id, name, cadre, batch \| null, post, workplace, village, union, photo \| null }`. Cadres: `admin, police, foreign, health, education, customs, tax, engineering, agriculture, judicial, other` |
+| `GET /notable-persons?field&search` · `GET /notable-persons/:id` | List returns summaries `{ id, name, title, field, born, died, photo, excerpt }`; detail adds `body` (plain text, blank line between paragraphs). Fields: `politics, literature, education, liberation, sports, social` |
+| `GET /videos?category&search` | Paginated `Video` `{ id, title, youtubeId, thumbnail \| null, category, duration (s), publishedAt }`, newest first. Categories: `tourism, history, food, news, culture` |
 
 ## Workers, education, uploads
 

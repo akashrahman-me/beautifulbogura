@@ -268,6 +268,43 @@ const routes: [string, string, Handler][] = [
     return ok(hits.slice(0, 30));
   }],
 
+  /* ---- matrimonial: a community post like the others (signed-in, owner-managed) ---- */
+  ...community({ base: '/matrimony', rows: db.matrimony, prefix: 'mat', kind: 'matrimony', title: (r) => `${r.gender === 'bride' ? 'পাত্রী' : 'পাত্র'}: ${r.name}`, href: () => '/marriage',
+    filter: (r, q) => (!q.get('gender') || r.gender === q.get('gender')) && (!q.get('religion') || r.religion === q.get('religion')) && matches(q.get('search'), r.profession, r.education, r.address, r.name),
+    build: (b) => ({ gender: String(b.gender), name: String(b.name), birthYear: Number(b.birthYear), religion: String(b.religion), maritalStatus: String(b.maritalStatus), education: String(b.education), profession: String(b.profession), familyMembers: String(b.familyMembers), preference: String(b.preference), address: String(b.address), phone: String(b.phone), whatsapp: Boolean(b.whatsapp), photo: (b.photo as string | null) ?? null }) }),
+
+  /* ---- voter lookup: never lists the whole roll ---- */
+  ['GET', '/voters', ({ query }) => {
+    const search = query.get('search')?.trim() ?? '';
+    const dob = query.get('dob');
+    const year = query.get('birthYear');
+    if (search.length < 3 && !dob && !year) return fail(422, 'FILTER_REQUIRED', 'নাম, ভোটার নম্বর বা জন্ম তারিখ দিন');
+    const u = query.get('union');
+    return paginate(db.voters.filter((v) => (!u || v.union === u) && (!dob || v.dob === dob) && (!year || v.dob.startsWith(year)) && (search.length < 3 || matches(search, v.name, v.voterNo))), query);
+  }],
+
+  /* ---- lists ---- */
+  ['GET', '/freedom-fighters', ({ query }) => {
+    const u = query.get('union');
+    return paginate(db.freedomFighters.filter((f) => (!u || f.union === u) && matches(query.get('search'), f.name, f.fatherName, f.idNo, f.village)), query);
+  }],
+  ['GET', '/achievers', ({ query }) => {
+    const c = query.get('cadre');
+    return paginate(db.achievers.filter((a) => (!c || a.cadre === c) && matches(query.get('search'), a.name, a.post, a.village, a.workplace)), query);
+  }],
+  ['GET', '/notable-persons', ({ query }) => {
+    const f = query.get('field');
+    return paginate(db.notablePersons.filter((p) => (!f || p.field === f) && matches(query.get('search'), p.name, p.title)).map(({ body: _b, ...rest }) => rest), query);
+  }],
+  ['GET', '/notable-persons/:id', ({ params }) => {
+    const p = db.notablePersons.find((x) => x.id === params.id);
+    return p ? ok(p) : fail(404, 'NOT_FOUND', 'তথ্য পাওয়া যায়নি');
+  }],
+  ['GET', '/videos', ({ query }) => {
+    const c = query.get('category');
+    return paginate(db.videos.filter((v) => (!c || v.category === c) && matches(query.get('search'), v.title)).sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)), query);
+  }],
+
   /* ---- uploads: object URLs stand in for stored files ---- */
   ['POST', '/uploads', ({ body }) => created({ urls: (body.files as File[]).map((f) => URL.createObjectURL(f)) })],
 

@@ -48,6 +48,9 @@ Other scripts: `pnpm typecheck`, `pnpm lint`, `pnpm test` (Vitest), `pnpm build`
 | Community (sign in with Google / Facebook / Apple to post; owner-managed) | `/jobs`, `/jobs/[id]`, `/jobs/new`, `/buy-sell`, `/buy-sell/new`, `/to-let`, `/to-let/new`, `/car-rent`, `/car-rent/new`, `/tuition`, `/tuition/new`, `/workers`, `/workers/register` |
 | Education | `/education` (list / map), `/education/[id]` (notices, claim), `/education/new` |
 | Area introduction | `/area`, `/area/municipality`, `/area/unions`, `/area/administration` |
-| Not built yet | `/soon/[slug]` placeholders: voter info, freedom fighters, notable persons, successful sons & daughters, matrimonial, videos |
+| Public service | `/voter-info` (lookup by name / voter no. / date of birth, union filter) |
+| People lists | `/freedom-fighters`, `/notable-persons`, `/notable-persons/[id]` (biography), `/achievers` (successful sons & daughters, by cadre) |
+| Marriage | `/marriage` (bride / groom, religion), `/marriage/register` (sign-in, owner-managed like community posts) |
+| Media | `/videos` (category filter; plays in a dialog via youtube-nocookie) |
 
 The backend contract the client expects is in [`API_CONTRACT.md`](API_CONTRACT.md).

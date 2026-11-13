@@ -17,7 +17,6 @@ export function ServiceTile({ service }: { service: Service }) {
         <Icon name={service.icon} size={26} strokeWidth={1.6} />
       </span>
       <span className="bb-tile-label">{service.label}</span>
-      {service.soon && <span className="bb-tile-badge">শীঘ্রই</span>}
     </Link>
   );
 }

@@ -21,6 +21,7 @@ const NEW_POST_LINKS = [
   { href: '/to-let/new', label: 'বাসা ভাড়া' },
   { href: '/car-rent/new', label: 'গাড়ি ভাড়া' },
   { href: '/tuition/new', label: 'টিউশন' },
+  { href: '/marriage/register', label: 'বায়োডাটা' },
 ];
 
 export function AccountPage() {

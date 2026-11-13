@@ -104,7 +104,6 @@ function SideMenu({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boo
                     <Link key={s.slug} href={s.href} className="flex min-h-11 items-center gap-3 rounded-md px-2 text-label hover:bg-surface-sunken">
                       <Icon name={s.icon} size={20} className={s.tone === 'emergency' ? 'text-emergency' : 'text-brand'} />
                       {s.label}
-                      {s.soon && <span className="ml-auto text-caption text-ink-subtle">শীঘ্রই</span>}
                     </Link>
                   ))}
                 </section>
