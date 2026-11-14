@@ -15,7 +15,7 @@ npm install
 npm run dev
 ```
 
-Runs on <http://localhost:3001>. Create `.env.local` from `.env.example`:
+Runs on <http://localhost:3001>. Start the API first (see [`../cloud/README.md`](../cloud/README.md)). Create `.env.local` from `.env.example`:
 
 | Variable | Meaning |
 |---|---|
@@ -24,7 +24,9 @@ Runs on <http://localhost:3001>. Create `.env.local` from `.env.example`:
 | `NEXT_PUBLIC_SITE_URL` | The public site, for “সাইটে দেখুন” links |
 | `NEXT_PUBLIC_DATA_MODE` | `api` (default) or `demo` — an in-browser fake of the whole admin API with sample data. Opt-in only, never a fallback. |
 
-**Demo mode:** any sign-in button signs you in as an admin. The account menu has a role switcher (প্রশাসক /
+**Local sign-in:** until real provider keys are in `cloud/.env`, the sign-in buttons open the API's development sign-in page. It has one-click shortcuts for the seeded প্রশাসক / মডারেটর / সম্পাদক (`admin@`, `moderator@`, `editor@example.com`). Any other email is refused with “এই অ্যাকাউন্টে কনসোলের অনুমতি নেই” unless it was invited or is listed in `ADMIN_EMAILS`.
+
+**Demo mode** (`NEXT_PUBLIC_DATA_MODE=demo`, no API needed): any sign-in button signs you in as an admin. The account menu has a role switcher (প্রশাসক /
 মডারেটর / সম্পাদক) to try what each role sees. Data lives in memory, so a full page reload resets it; the
 sign-in survives.
 

@@ -1,7 +1,10 @@
 # API contract expected by the web client
 
-Base: `NEXT_PUBLIC_API_URL` (e.g. `https://api.example.com/api/v1`). JSON in and out.
-`src/mocks/demo-server.ts` implements every endpoint below in the browser and is the reference behaviour.
+Base: `NEXT_PUBLIC_API_URL` (local: `http://localhost:4000/api/v1`). JSON in and out.
+The server is `cloud/` (Express + MongoDB). Its live OpenAPI document is at `http://localhost:4000/api/docs`
+(development) and is generated from the same route table, so it is the final word when this file and the
+code disagree. `src/mocks/demo-server.ts` still implements every endpoint in the browser for
+`NEXT_PUBLIC_DATA_MODE=demo`. Keep it in step when an endpoint changes.
 Types live in each feature's `schemas/*.schema.ts`.
 
 ## Envelope
@@ -10,11 +13,22 @@ Types live in each feature's `schemas/*.schema.ts`.
 // success
 { "success": true, "message": "OK", "data": <T>, "meta": { "page": 1, "limit": 12, "total": 40, "totalPages": 4 } }
 // failure — switch on `code`, never on `message`; `errors[].path` maps onto form fields
-{ "success": false, "message": "ফোন নম্বর ঠিক নেই", "code": "VALIDATION", "errors": [{ "path": "phone", "message": "১১ সংখ্যার মোবাইল নম্বর লিখুন" }] }
+{ "success": false, "message": "ফোন নম্বর ঠিক নেই", "code": "VALIDATION_ERROR", "errors": [{ "path": "phone", "message": "১১ সংখ্যার মোবাইল নম্বর লিখুন" }] }
 ```
 
 `meta` is present on list endpoints. Messages are shown to users, so write them in Bangla.
-Codes the client handles specially: `UNAUTHENTICATED` (401), `NOT_OWNER` (403), `NOT_FOUND` (404), `DONOR_EXISTS` (409), `PHONE_MISMATCH` (403), `VALIDATION` (422).
+`DELETE` answers `204` with no body. Error codes:
+
+| Status | Codes |
+|---|---|
+| 400 | `VALIDATION_ERROR` (with `errors[]`; `path` is the field name, e.g. `phone`, `chambers.0.time`), `INVALID_ID`, `BAD_JSON`, `UNSUPPORTED_FILE`, `STATE_INVALID` |
+| 401 | `UNAUTHENTICATED` (no / bad token; the client refreshes once and retries), `TOKEN_EXPIRED`, `NO_SESSION` (refresh without a cookie), `SESSION_REVOKED` (a reused refresh token; sign in again) |
+| 403 | `FORBIDDEN`, `NOT_OWNER`, `PHONE_MISMATCH`, `BANNED` (banned accounts cannot post), `NOT_ADDABLE` / `NOT_RATABLE` (directory type does not allow it) |
+| 404 | `NOT_FOUND`, `ROUTE_NOT_FOUND` |
+| 409 | `DONOR_EXISTS`, `WORKER_EXISTS`, `DUPLICATE_KEY`, `CONFLICT` |
+| 413 | `PAYLOAD_TOO_LARGE` (photo over the size limit) |
+| 429 | `RATE_LIMITED`, `POST_LIMIT` (posts per user per day, from site settings) |
+| 503 | `MAINTENANCE` (posting paused in site settings), `WEATHER_UNAVAILABLE` |
 
 Every list accepts `page`, `limit`, `search` plus the filters listed. Phones are sent as `01XXXXXXXXX` (Latin digits). Dates are ISO-8601.
 
@@ -55,8 +69,10 @@ There is no password, PIN or sign-up endpoint. A person signs in with **Google, 
 | Method & path | Notes |
 |---|---|
 | `GET /auth/:provider?returnTo=/path` | Browser navigation, not XHR. `provider` = `google` \| `facebook` \| `apple`. Start the OAuth 2.0 / OpenID Connect flow with `state` + PKCE and redirect to the provider. Keep `returnTo` only if it is a same-site path (starts with `/`, not `//`). |
-| `GET\|POST /auth/:provider/callback` | Provider redirect URI (Apple uses `form_post`). Verify `state` and the ID token, then upsert the user by `(provider, providerUserId)`; if the provider gives a **verified** email that matches an existing user, link to that user instead of creating a second one. Set the refresh token as an httpOnly, `Secure`, `SameSite=Lax` cookie (`None` only if the API is on an unrelated domain) and `302` to `NEXT_PUBLIC_APP_URL + returnTo`. On failure `302` to `/?authError=cancelled\|email_required\|provider_error`. |
-| `POST /auth/refresh` | Uses the cookie. → `{ accessToken, user }` where `user` = `{ id, name, email \| null, avatar \| null, provider }`. Rotate the refresh token. 401 `NO_SESSION` when signed out. |
+| `GET\|POST /auth/:provider/callback` | Provider redirect URI (Apple uses `form_post`). Verify `state` and the ID token, then upsert the user by `(provider, providerUserId)`; if the provider gives a **verified** email that matches an existing user, link to that user instead of creating a second one. Set the refresh token as an httpOnly cookie `bb_rt` (path `/api/v1/auth`, `Secure` unless `COOKIE_SECURE=false` locally) and `303` to `CLIENT_URL + returnTo`. On failure `303` to `returnTo?authError=cancelled\|provider_error`. |
+| `GET\|POST /auth/dev` | **Development only** (`AUTH_DEV_LOGIN=true`, refused in production). When a provider has no credentials, `/auth/:provider` sends the browser here instead: a local page to pick a seeded account or type a name and email, standing in for the provider. |
+| `POST /auth/refresh` | Uses the cookie (send `credentials: "include"`). → `{ accessToken, user }` where `user` = `{ id, name, email \| null, avatar \| null, provider }`. Rotates the refresh token; replaying an old one revokes the whole session family (401 `SESSION_REVOKED`). 401 `NO_SESSION` when signed out. |
+| `GET /auth/me` | Auth required. The signed-in account. |
 | `POST /auth/logout` | Revokes the refresh token and clears the cookie. |
 | `GET /me/posts` | Auth required. The caller's community posts across all kinds, newest first, excluding deleted: `MyPost[]` `{ kind: job\|listing\|rental\|vehicle\|tuition\|matrimony, id, title, status, createdAt, href }`. `href` is where the post is seen on the site (e.g. `/jobs/:id`, `/to-let`). |
 
@@ -83,13 +99,13 @@ Featured / verified flags are admin-only and never accepted from these endpoints
 
 A community post (above): sign-in to create, owner-only manage, `mark-done` = “বিয়ে ঠিক হয়েছে” and drops the profile from the list.
 `GET /matrimony?gender=bride|groom&religion&search` → paginated `Matrimonial` `{ id, ownerId, gender, name, birthYear, religion, maritalStatus, education, profession, familyMembers, preference, address, phone, whatsapp, photo, createdAt, status }`.
-`POST /matrimony` body: the same fields minus server-set ones, `photo` as an `/uploads` URL or null. Reject when the age from `birthYear` is under the legal minimum (bride 18, groom 21) with 422 `VALIDATION` on `birthYear`. Rate-limit per user; a confirmed fake profile should block the account.
+`POST /matrimony` body: the same fields minus server-set ones, `photo` as an `/uploads` URL or null. Reject when the age from `birthYear` is under the legal minimum (bride 18, groom 21) with 400 `VALIDATION_ERROR` on `birthYear`. Rate-limit per user; a confirmed fake profile should block the account.
 
 ## Public records & media
 
 | Method & path | Notes |
 |---|---|
-| `GET /voters?union&search&dob&birthYear` | Paginated `Voter` `{ id, name, fatherName, motherName, voterNo, dob, gender, union, village, centre }`. **Requires** `search` (≥ 3 chars, name or voter no.) or `dob` (yyyy-mm-dd) or `birthYear`; otherwise 422 `FILTER_REQUIRED`, so the roll cannot be paged through. Rate-limit per IP. |
+| `GET /voters?union&search&dob&birthYear` | Paginated `Voter` `{ id, name, fatherName, motherName, voterNo, dob, gender, union, village, centre }`. **Requires** `search` (≥ 3 chars, name or voter no.) or `dob` (yyyy-mm-dd) or `birthYear`; otherwise 400 `VALIDATION_ERROR` on `search`, so the roll cannot be paged through. Rate-limit per IP. |
 | `GET /freedom-fighters?union&search` | Paginated `FreedomFighter` `{ id, name, fatherName, idNo, village, union, sector \| null, alive, photo \| null }`; `meta.total` is shown as the count |
 | `GET /achievers?cadre&search` | Paginated `Achiever` `{ id, name, cadre, batch \| null, post, workplace, village, union, photo \| null }`. Cadres: `admin, police, foreign, health, education, customs, tax, engineering, agriculture, judicial, other` |
 | `GET /notable-persons?field&search` · `GET /notable-persons/:id` | List returns summaries `{ id, name, title, field, born, died, photo, excerpt }`; detail adds `body` (plain text, blank line between paragraphs). Fields: `politics, literature, education, liberation, sports, social` |
@@ -104,3 +120,18 @@ A community post (above): sign-in to create, owner-only manage, `mark-done` = �
 | `POST /institutions/:id/claims` | `{ name, role, phone, email?, proof }` → pending |
 | `GET /notices?institution&limit` | Paginated `Notice`, newest first |
 | `POST /uploads` | multipart, field `files` (≤ 5 images, ≤ 5 MB each) → `{ urls: string[] }` |
+
+## Site, home and notifications
+
+| Method & path | Notes |
+|---|---|
+| `GET /site/settings` | Public part of the console's settings: `{ contact: { adminPhone, email }, social: { facebook, whatsapp, telegram, tiktok, youtube }, posting: { jobDurations[], rentalDays, tuitionDays, vehicleDays, matrimonyDays, maxPhotos, postsPerDay }, maintenance: { enabled, message } }` |
+| `GET /site/notice` | The site-wide notice bar `{ severity: info\|warning\|emergency, title, body, linkLabel, linkHref, expiresAt \| null }`, or `null` when off or expired |
+| `GET /home/slides` | Home hero slides published and inside their schedule, in order |
+| `POST /services/:slug/views` | `204`. Counts one open of a service tile (feeds `/services/popular`) |
+| `GET /push/key` | VAPID public key, or `null` when push is not configured |
+| `POST /push/subscriptions` · `DELETE /push/subscriptions` | Save / forget this browser's `PushSubscription` (`{ endpoint, keys: { p256dh, auth } }`) |
+
+The site does not yet read `/home/slides`, `/site/notice` or `/site/settings`. It still uses the
+hard-coded values (see `plans/console.md` §5).
+

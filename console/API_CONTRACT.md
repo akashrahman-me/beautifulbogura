@@ -1,15 +1,27 @@
 # Admin API contract expected by the console
 
-Base: `NEXT_PUBLIC_API_URL`. Same envelope, pagination and error rules as the public API
-(`../client/API_CONTRACT.md`). `src/mocks/demo-server.ts` implements every endpoint below and is the
-reference behaviour.
+Base: `NEXT_PUBLIC_API_URL` (local: `http://localhost:4000/api/v1`). Same envelope, pagination and error
+rules as the public API (`../client/API_CONTRACT.md`). The server is `cloud/`. Its OpenAPI document at
+`http://localhost:4000/api/docs` is generated from the route table, so it is the final word.
+`src/mocks/demo-server.ts` mirrors every endpoint for `NEXT_PUBLIC_DATA_MODE=demo`. Keep it in step.
 
 ## Auth and roles
 
 Staff use the same social sign-in as the public site: `GET /auth/:provider?returnTo=/path&app=console`
-returns to `NEXT_PUBLIC_APP_URL + returnTo`. `POST /auth/refresh` returns `{ accessToken, user }` where
-`user.role` is `admin | moderator | editor | null`. A non-staff sign-in to the console redirects with
-`?authError=not_staff`. `POST /auth/logout` revokes the session.
+returns to `CONSOLE_URL + returnTo`. The console has its own refresh cookie (`bb_rt_console`), separate from
+the site's `bb_rt`. The API tells the two apps apart by the request's `Origin`, so signing out of one leaves the
+other signed in. `POST /auth/refresh` returns `{ accessToken, user }` where `user.role` is
+`admin | moderator | editor | null`. A non-staff sign-in to the console redirects to
+`/login?authError=not_staff`. A refresh for someone who lost their role gets 401 `NOT_STAFF`.
+`POST /auth/logout` revokes the session.
+
+Who becomes staff:
+- Verified emails listed in `ADMIN_EMAILS` become admins on first sign-in.
+- Everyone else needs an invite (`POST /admin/staff`). The invite is accepted the first time that verified
+  email signs in.
+
+Locally, `/auth/dev` has one-click shortcuts for the seeded `admin@`, `moderator@` and `editor@example.com`.
+The API re-reads role and ban status from the database on every request, so a role change takes effect at once.
 
 Every `/admin/*` route requires a staff role and one permission (plans/console.md §1); otherwise
 401 `UNAUTHENTICATED` / 403 `FORBIDDEN`. Every write appends an audit entry (who, action, resource,
@@ -34,8 +46,9 @@ reason, changed fields) in the same transaction.
 Every list: `?page&limit&search&sort` (`field` or `-field`) plus its filters → paginated.
 CRUD resources also take `GET /:id`, `POST`, `PATCH /:id`, `DELETE /:id` (soft; body may carry
 `{ reason, note }`) and `POST /:id/restore`. Photos arrive as URLs from `POST /uploads`.
-Errors that the UI handles: 409 `ALREADY_DECIDED`, `STAFF_EXISTS`, `LAST_ADMIN`, `SELF`; 422 `VALIDATION`
-(`errors[].path` maps onto the form field), `FILTER_REQUIRED`, `BAD_CSV`.
+Errors that the UI handles: 409 `ALREADY_DECIDED`, `STAFF_EXISTS`, `LAST_ADMIN`, `SELF`, `IS_STAFF` (ban a
+staff member: remove their role first); 404 `NOTHING_TO_RESTORE`; 400 `VALIDATION_ERROR` (`errors[].path` maps
+onto the form field; voter search under 3 characters lands here too), `BAD_CSV`.
 
 ## Shell
 
@@ -93,20 +106,21 @@ Every item carries `hidden` (or `published`) so it can leave the site without be
 | `/admin/site-notice` | `{ enabled, severity: info\|warning\|emergency, title, body, linkLabel, linkHref, expiresAt }` |
 | `/admin/settings` | `{ contact, social, posting, moderation, maintenance }` — see `features/settings` |
 
-Responses add `updatedAt` and `updatedBy`. The public site should read the notice, slides and settings
+Responses add `updatedAt` and `updatedBy`. The public site should read (not wired in the client yet) the notice, slides and settings
 from `GET /site/notice`, `GET /home/slides`, `GET /site/settings`.
 
 ## Push notifications
 
 `GET /admin/push` — history. `POST /admin/push` `{ title ≤ 60, body ≤ 160, url, audience: all|donors, bloodGroup? }`
-sends immediately (Web Push to subscribed browsers) and returns `{ recipients }`.
+sends immediately (Web Push to subscribed browsers) and returns the history entry with `recipients`. Without
+`VAPID_*` keys in `cloud/.env` it is recorded with `delivered: false` and nothing is sent.
 
 ## Voter roll
 
 | Method & path | Notes |
 |---|---|
 | `GET /admin/voters/stats` | `{ total, byUnion[{union,total,male,female,third}], lastImport }` |
-| `GET /admin/voters?search&union` | `search` ≥ 3 characters required (422 `FILTER_REQUIRED`); **every search is audited** |
+| `GET /admin/voters?search&union` | `search` ≥ 3 characters required (400 `VALIDATION_ERROR`); **every search is audited** |
 | `POST /admin/voters/import` | multipart `file` (CSV, columns `voterNo,name,fatherName,motherName,dob,gender,union,village,centre`); upsert by `voterNo`; returns `{ imported, updated, skipped, errors[{row,message}] }` |
 | `GET /admin/voters/imports` | Import history |
 
@@ -117,5 +131,6 @@ sends immediately (Web Push to subscribed browsers) and returns `{ recipients }`
 | `GET /admin/staff` | `{ id, name, email, avatar, provider, role, status: active\|invited, invitedBy, invitedAt, lastActiveAt }` |
 | `POST /admin/staff` | `{ email, role }` — invite; the role activates when that email first signs in. 409 `STAFF_EXISTS` |
 | `POST /admin/staff/:id/role` | `{ role }`. 409 `SELF`, `LAST_ADMIN` |
-| `POST /admin/staff/:id/resend` · `DELETE /admin/staff/:id` | Resend invite · remove access (409 `SELF`) |
+| `POST /admin/staff/:id/resend` · `DELETE /admin/staff/:id` | Resend invite · remove access (409 `SELF`; signs them out of the console) |
+| `POST /admin/staff/:id/restore` | Undo a removal (404 `NOTHING_TO_RESTORE`) |
 | `GET /admin/audit?actor&action&type&from&to&search` | Newest first; entries are append-only |

@@ -1,15 +1,14 @@
 # Console — the admin dashboard for বিউটিফুল বগুড়া
 
-> Status: frontend built in `console/` (all modules below, running on an in-browser demo API). Backend endpoints: `console/API_CONTRACT.md`.
+> Status: built. Frontend in `console/`, backend in `cloud/` (every `/admin/*` endpoint, verified end-to-end). Contract: `console/API_CONTRACT.md`.
 
 `client/` is the public portal. `console/` is a separate Next.js app for the people who run it:
 the site owner, moderators and data editors. Same stack and architecture as the client
 (Next.js 16 · React 19 · TanStack Query · nuqs · Zustand · React Hook Form + Zod · Tailwind v4 with the
 design-system tokens and `bb-*` components), its own deploy (e.g. `console.example.com`), `noindex`.
 
-The backend does not exist yet. The console talks to `/admin/*` endpoints described in
-`console/API_CONTRACT.md`; until they exist it runs on an in-browser fake (`NEXT_PUBLIC_DATA_MODE=demo`),
-exactly like the client.
+The console talks to the `/admin/*` endpoints served by `cloud/` (described in `console/API_CONTRACT.md`).
+With `NEXT_PUBLIC_DATA_MODE=demo` it runs on an in-browser fake instead, exactly like the client.
 
 ---
 

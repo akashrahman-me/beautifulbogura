@@ -7,12 +7,14 @@ Built to `architecture.md`, the feature list in `../plans/features.md`, and the
 ## Run it
 
 ```bash
-pnpm install
+npm install
 ```
 
 ```bash
-pnpm dev
+npm run dev
 ```
+
+Runs on <http://localhost:3000>. Start the API first (see [`../cloud/README.md`](../cloud/README.md)).
 
 Create `.env.local` (see `.env.example`):
 
@@ -22,11 +24,13 @@ Create `.env.local` (see `.env.example`):
 | `NEXT_PUBLIC_APP_URL` | This site's URL |
 | `NEXT_PUBLIC_DATA_MODE` | `api` (default) talks to the backend. `demo` serves bundled sample data from `src/mocks/` through the same API client — opt-in only, never a fallback. |
 
-Until the backend exists, run with `NEXT_PUBLIC_DATA_MODE=demo`. Any of the Google / Facebook / Apple buttons signs you in at once as a demo user (no real provider involved), and the first seeded post of each kind belongs to that user so you can try the owner controls.
+**Local sign-in:** until real provider keys are in `cloud/.env`, the Google / Facebook / Apple buttons open the API's development sign-in page (`/api/v1/auth/dev`). There you pick a seeded account (`user1@example.com` … owns seeded posts) or type any name and email.
+
+**Demo mode** (`NEXT_PUBLIC_DATA_MODE=demo`, no API needed): any sign-in button signs you in at once as a demo user. The first seeded post of each kind belongs to that user, so you can try the owner controls.
 
 **Accounts:** browsing needs nothing. Posting a job, sale, to-let, car or tuition ad asks you to sign in with Google, Facebook or Apple — the first sign-in creates the account, there is no sign-up page and no PIN. Owners manage their posts on the post itself or at `/account`. Provider setup lives in the API (see [`API_CONTRACT.md`](API_CONTRACT.md#accounts-social-sign-in-only)).
 
-Other scripts: `pnpm typecheck`, `pnpm lint`, `pnpm test` (Vitest), `pnpm build`.
+Other scripts: `npm run typecheck`, `npm run lint`, `npm test` (Vitest), `npm run build`.
 
 ## How it is put together
 

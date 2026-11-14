@@ -1,10 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  experimental: {
-    agentFeedback: true,
-  },
+  // Agent docs live at the repo root (CLAUDE.md, .claude/); don't let `next dev` write AGENTS.md.
+  agentRules: false,
   cacheComponents: true,
   reactCompiler: true,
   typedRoutes: false,
